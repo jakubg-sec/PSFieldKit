@@ -35,17 +35,46 @@ function Show-NetworkMenu {
         switch ($Choice) {
 
             '1' {
-                Write-Host "Target: $($Context.ComputerName)"
+                Get-networkadapters -Context $Context
                 Pause
             }
 
             '2' {
-                Write-Host "Target: $($Context.ComputerName)"
+                Get-NetworkIPConfiguration -Context $Context
                 Pause
             }
 
             '3' {
-                Write-Host "Target: $($Context.ComputerName)"
+                Get-RoutingTable -Context $Context
+                Pause
+            }
+
+            '4' {
+                Get-NetworkNeighborTable -Context $Context
+                Pause
+            }
+
+            '5' {
+                Test-DNSDiagnostics -Context $Context
+                Pause
+            }
+
+            '6' {
+                Test-NetworkConnectivity -Context $Context
+            }
+
+            '7' {
+                Get-PortsAndConnections -Context $Context
+                Pause
+            }
+
+            '8' {
+                Get-NetworkStatistics -Context $Context
+                Pause
+            }
+
+            '9' {
+                Get-FirewallInformation -Context $Context
                 Pause
             }
 

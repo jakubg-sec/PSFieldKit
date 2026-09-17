@@ -11,6 +11,16 @@
 . $PSScriptRoot\Public\ComputerInformation\Get-Uptime.ps1
 
 . $PSScriptRoot\Public\NetworkDiagnostics\Show-NetworkMenu.ps1
+. $PSScriptRoot\Public\NetworkDiagnostics\Get-NetworkAdapters.ps1
+. $PSScriptRoot\Public\NetworkDiagnostics\Get-NetworkIPConfiguration.ps1
+. $PSScriptRoot\Public\NetworkDiagnostics\Get-RoutingTable.ps1
+. $PSScriptRoot\Public\NetworkDiagnostics\Get-NetworkNeighborTable.ps1
+. $PSScriptRoot\Public\NetworkDiagnostics\Test-DNSDiagnostics.ps1
+. $PSScriptRoot\Public\NetworkDiagnostics\Test-NetworkConnectivity.ps1
+. $PSScriptRoot\Public\NetworkDiagnostics\Get-PortsAndConnections.ps1
+. $PSScriptRoot\Public\NetworkDiagnostics\Get-NetworkStatistics.ps1
+. $PSScriptRoot\Public\NetworkDiagnostics\Get-FirewallInformation.ps1
+
 . $PSScriptRoot\Public\ActiveDirectory\Show-ADMenu.ps1
 . $PSScriptRoot\Public\ProcessesServices\Show-ProcessServiceMenu.ps1
 . $PSScriptRoot\Public\EventLogs\Show-EventLogMenu.ps1
