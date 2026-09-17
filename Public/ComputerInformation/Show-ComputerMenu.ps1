@@ -39,12 +39,37 @@ function Show-ComputerMenu {
             }
 
             '2' {
-                Write-Host "Target: $($Context.ComputerName)"
+                Get-OperatingSystemInformation -Context $Context | Format-List
                 Pause
             }
 
             '3' {
-                Write-Host "Target: $($Context.ComputerName)"
+                Get-HardwareInformation -Context $Context | Format-List
+                Pause
+            }
+
+            '4' {
+                Get-CPUInformation -Context $Context | Format-List
+                Pause
+            }
+
+            '5' {
+                Get-MemoryInformation -Context $Context | Format-List
+                Pause
+            }
+
+            '6' {
+                Get-DiskInformation -Context $Context
+                Pause
+            }
+
+            '7' {
+                Get-NetworkAdapterInformation -Context $Context | Format-Table -AutoSize
+                Pause
+            }
+
+            '8' {
+                Get-Uptime -Context $Context | Format-List
                 Pause
             }
 

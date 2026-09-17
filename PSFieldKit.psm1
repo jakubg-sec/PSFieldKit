@@ -2,6 +2,13 @@
 . $PSScriptRoot\Public\Show-PSFieldKitMenu.ps1
 . $PSScriptRoot\Public\ComputerInformation\Show-ComputerMenu.ps1
 . $PSScriptRoot\Public\ComputerInformation\Get-SystemInformation.ps1
+. $PSScriptRoot\Public\ComputerInformation\Get-OperatingSystemInformation.ps1
+. $PSScriptRoot\Public\ComputerInformation\Get-HardwareInformation.ps1
+. $PSScriptRoot\Public\ComputerInformation\Get-CPUInformation.ps1
+. $PSScriptRoot\Public\ComputerInformation\Get-MemoryInformation.ps1
+. $PSScriptRoot\Public\ComputerInformation\Get-DiskInformation.ps1
+. $PSScriptRoot\Public\ComputerInformation\Get-NetworkAdapterInformation.ps1
+. $PSScriptRoot\Public\ComputerInformation\Get-Uptime.ps1
 
 . $PSScriptRoot\Public\NetworkDiagnostics\Show-NetworkMenu.ps1
 . $PSScriptRoot\Public\ActiveDirectory\Show-ADMenu.ps1
