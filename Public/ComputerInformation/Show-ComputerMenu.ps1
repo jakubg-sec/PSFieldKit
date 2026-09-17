@@ -34,7 +34,7 @@ function Show-ComputerMenu {
         switch ($Choice) {
 
             '1' {
-                Write-Host "Target: $($Context.ComputerName)"
+                Get-SystemInformation -Context $Context | Format-List
                 Pause
             }
 

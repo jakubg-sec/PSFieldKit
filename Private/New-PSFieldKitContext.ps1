@@ -34,10 +34,23 @@ function New-PSFieldKitContext {
                 $ComputerName = Read-Host "Enter computer name or IP"
 
                 if ([string]::IsNullOrWhiteSpace($ComputerName)) {
+
                     Write-Host "`nComputer name cannot be empty." -ForegroundColor Red
                     Start-Sleep -Seconds 1
                     continue
                 }
+
+                Write-Host "`nTesting connection to $ComputerName..." -ForegroundColor Yellow
+
+                if (-not (Test-PSFieldKitTarget -ComputerName $ComputerName)) {
+
+                    Write-Host "Unable to connect to $ComputerName." -ForegroundColor Red
+                    Start-Sleep -Seconds 2
+                    continue
+                }
+
+                Write-Host "Connection successful." -ForegroundColor Green
+                Start-Sleep -Seconds 1
 
                 return [PSCustomObject]@{
                     ComputerName = $ComputerName
@@ -47,10 +60,12 @@ function New-PSFieldKitContext {
             }
 
             '0' {
+
                 return $null
             }
 
             default {
+
                 Write-Host "`nInvalid option." -ForegroundColor Red
                 Start-Sleep -Seconds 1
             }
