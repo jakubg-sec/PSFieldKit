@@ -9,6 +9,7 @@
 . $PSScriptRoot\Public\Security\Show-SecurityMenu.ps1
 . $PSScriptRoot\Public\RemoteAdministration\Show-RemoteAdministrationMenu.ps1
 . $PSScriptRoot\Public\SoftwareUpdates\Show-SoftwareMenu.ps1
+. $PSScriptRoot\Public\ComputerInformation\Get-ComputerInformation.ps1
 
 # . $PSScriptRoot/public/Show-PSFieldKitMenu.ps1
 # . $PSScriptRoot/public/Show-ComputerMenu.ps1
