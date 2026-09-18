@@ -81,7 +81,7 @@ function Show-ADMenu {
             }
 
             '11' {
-                Search-ActiveDirectory
+                Show-ADSearchMenu
             }
 
             '12' {

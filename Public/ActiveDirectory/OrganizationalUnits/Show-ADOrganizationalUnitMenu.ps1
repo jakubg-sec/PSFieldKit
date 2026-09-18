@@ -14,8 +14,7 @@ function Show-ADOrganizationalUnitMenu {
         Write-Host "|  [3] Search OUs                              |"
         Write-Host "|  [4] Create OU                               |"
         Write-Host "|  [5] Rename OU                               |"
-        Write-Host "|  [6] Move Object                             |"
-        Write-Host "|  [7] Remove OU                               |"
+        Write-Host "|  [6] Remove OU                               |"
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"
         Write-Host "|                                              |"
@@ -41,22 +40,17 @@ function Show-ADOrganizationalUnitMenu {
             }
 
             '4' {
-                New-ADOrganizationalUnit
+                New-PSFKADOrganizationalUnit
                 Pause
             }
 
             '5' {
-                Rename-ADOrganizationalUnit
+                Rename-PSFKADOrganizationalUnit
                 Pause
             }
 
             '6' {
-                Move-ADObject
-                Pause
-            }
-
-            '7' {
-                Remove-ADOrganizationalUnit
+                Remove-PSFKADOrganizationalUnit
                 Pause
             }
 

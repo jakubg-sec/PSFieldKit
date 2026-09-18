@@ -18,7 +18,6 @@ function Show-ADGroupMenu {
         Write-Host "|  [7] Group Members                           |"
         Write-Host "|  [8] User Group Membership                   |"
         Write-Host "|  [9] Nested Group Membership                 |"
-        Write-Host "| [10] Group Scope & Type                      |"
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"
         Write-Host "|                                              |"
@@ -70,11 +69,6 @@ function Show-ADGroupMenu {
 
             '9' {
                 Get-ADNestedGroupMembership
-                Pause
-            }
-
-            '10' {
-                Get-ADGroupScopeType
                 Pause
             }
 

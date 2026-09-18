@@ -15,10 +15,8 @@ function Show-ADComputerMenu {
         Write-Host "|  [4] Enable Computer                         |"
         Write-Host "|  [5] Disable Computer                        |"
         Write-Host "|  [6] Reset Computer Account                  |"
-        Write-Host "|  [7] Move Computer                           |"
-        Write-Host "|  [8] Remove Computer                         |"
-        Write-Host "|  [9] Operating System Information            |"
-        Write-Host "| [10] Last Logon Information                  |"
+        Write-Host "|  [7] Remove Computer                         |"
+        Write-Host "|  [8] Last Logon Information                  |"
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"
         Write-Host "|                                              |"
@@ -59,21 +57,11 @@ function Show-ADComputerMenu {
             }
 
             '7' {
-                Move-ADComputerAccount
-                Pause
-            }
-
-            '8' {
                 Remove-ADComputerAccount
                 Pause
             }
 
-            '9' {
-                Get-ADComputerOperatingSystem
-                Pause
-            }
-
-            '10' {
+            '8' {
                 Get-ADComputerLastLogon
                 Pause
             }

@@ -1,5 +1,21 @@
 function Show-ADGPOMenu {
 
+    try {
+
+        Import-Module GroupPolicy -ErrorAction Stop
+    }
+    catch {
+
+        Write-Host "`nGroup Policy PowerShell module is not installed." `
+            -ForegroundColor Red
+
+        Write-Host "Install Group Policy Management Tools (GPMC) and try again." `
+            -ForegroundColor Yellow
+
+        Pause
+        return
+    }
+
     while ($true) {
 
         Clear-Host
@@ -14,7 +30,7 @@ function Show-ADGPOMenu {
         Write-Host "|  [3] GPO Links                               |"
         Write-Host "|  [4] GPO Permissions                         |"
         Write-Host "|  [5] Generate GPReport                       |"
-        Write-Host "|  [6] Force GPUpdate                          |"
+        Write-Host "|  [6] Force GPUpdate                           |"
         Write-Host "|  [7] Group Policy Results                    |"
         Write-Host "|  [8] Group Policy Modeling                   |"
         Write-Host "|  [9] GPO Diagnostics                         |"

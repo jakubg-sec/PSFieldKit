@@ -5,18 +5,17 @@ function Show-ADDomainControllerMenu {
         Clear-Host
 
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
-        Write-Host "|             Domain Controllers              |" -ForegroundColor Cyan
+        Write-Host "|              Domain Controllers              |" -ForegroundColor Cyan
         Write-Host "|                 PSFieldKit                   |" -ForegroundColor Cyan
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|                                              |"
         Write-Host "|  [1] Domain Controller Information           |"
         Write-Host "|  [2] List Domain Controllers                 |"
-        Write-Host "|  [3] FSMO Roles                              |"
-        Write-Host "|  [4] Services                                |"
-        Write-Host "|  [5] SYSVOL / NETLOGON                       |"
-        Write-Host "|  [6] Connectivity                            |"
-        Write-Host "|  [7] Event Logs                              |"
-        Write-Host "|  [8] DC Diagnostics                          |"
+        Write-Host "|  [3] Services                                |"
+        Write-Host "|  [4] SYSVOL / NETLOGON                       |"
+        Write-Host "|  [5] Connectivity                            |"
+        Write-Host "|  [6] Event Logs                              |"
+        Write-Host "|  [7] DC Diagnostics                          |"
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"
         Write-Host "|                                              |"
@@ -37,31 +36,26 @@ function Show-ADDomainControllerMenu {
             }
 
             '3' {
-                Get-ADFSMORoles
-                Pause
-            }
-
-            '4' {
                 Get-ADDomainControllerServices
                 Pause
             }
 
-            '5' {
+            '4' {
                 Test-ADDomainControllerSYSVOL
                 Pause
             }
 
-            '6' {
+            '5' {
                 Test-ADDomainControllerConnectivity
                 Pause
             }
 
-            '7' {
+            '6' {
                 Get-ADDomainControllerEventLogs
                 Pause
             }
 
-            '8' {
+            '7' {
                 Test-ADDomainControllerDiagnostics
                 Pause
             }
