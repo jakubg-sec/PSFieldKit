@@ -25,12 +25,12 @@ function Show-ADDomainForestMenu {
         switch ($Choice) {
 
             '1' {
-                Get-ADDomainInformation
+                Get-ADDomainInformation | Format-List
                 Pause
             }
 
             '2' {
-                Get-ADForestInformation
+                Get-ADForestInformation | Format-List
                 Pause
             }
 

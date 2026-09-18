@@ -18,7 +18,6 @@ function Show-ADUserMenu {
         Write-Host "|  [7] Reset Password                          |"
         Write-Host "|  [8] Remove User                             |"
         Write-Host "|  [9] Group Membership                        |"
-        Write-Host "| [10] Account Status                          |"
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"
         Write-Host "|                                              |"
@@ -70,10 +69,6 @@ function Show-ADUserMenu {
 
             '9' {
                 Show-ADUserGroupMembership
-            }
-
-            '10' {
-                Get-ADUserAccountStatus
                 Pause
             }
 
