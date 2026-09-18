@@ -1,35 +1,21 @@
-# Public
-. $PSScriptRoot\Public\Show-PSFieldKitMenu.ps1
-. $PSScriptRoot\Public\ComputerInformation\Show-ComputerMenu.ps1
-. $PSScriptRoot\Public\ComputerInformation\Get-SystemInformation.ps1
-. $PSScriptRoot\Public\ComputerInformation\Get-OperatingSystemInformation.ps1
-. $PSScriptRoot\Public\ComputerInformation\Get-HardwareInformation.ps1
-. $PSScriptRoot\Public\ComputerInformation\Get-CPUInformation.ps1
-. $PSScriptRoot\Public\ComputerInformation\Get-MemoryInformation.ps1
-. $PSScriptRoot\Public\ComputerInformation\Get-DiskInformation.ps1
-. $PSScriptRoot\Public\ComputerInformation\Get-NetworkAdapterInformation.ps1
-. $PSScriptRoot\Public\ComputerInformation\Get-Uptime.ps1
-
-. $PSScriptRoot\Public\NetworkDiagnostics\Show-NetworkMenu.ps1
-. $PSScriptRoot\Public\NetworkDiagnostics\Get-NetworkAdapters.ps1
-. $PSScriptRoot\Public\NetworkDiagnostics\Get-NetworkIPConfiguration.ps1
-. $PSScriptRoot\Public\NetworkDiagnostics\Get-RoutingTable.ps1
-. $PSScriptRoot\Public\NetworkDiagnostics\Get-NetworkNeighborTable.ps1
-. $PSScriptRoot\Public\NetworkDiagnostics\Test-DNSDiagnostics.ps1
-. $PSScriptRoot\Public\NetworkDiagnostics\Test-NetworkConnectivity.ps1
-. $PSScriptRoot\Public\NetworkDiagnostics\Get-PortsAndConnections.ps1
-. $PSScriptRoot\Public\NetworkDiagnostics\Get-NetworkStatistics.ps1
-. $PSScriptRoot\Public\NetworkDiagnostics\Get-FirewallInformation.ps1
-
-. $PSScriptRoot\Public\ActiveDirectory\Show-ADMenu.ps1
-. $PSScriptRoot\Public\ProcessesServices\Show-ProcessServiceMenu.ps1
-. $PSScriptRoot\Public\EventLogs\Show-EventLogMenu.ps1
-. $PSScriptRoot\Public\StorageDisks\Show-StorageMenu.ps1
-. $PSScriptRoot\Public\Security\Show-SecurityMenu.ps1
-. $PSScriptRoot\Public\RemoteAdministration\Show-RemoteAdministrationMenu.ps1
-. $PSScriptRoot\Public\SoftwareUpdates\Show-SoftwareMenu.ps1
-
-
 # Private
-. $PSScriptRoot\Private\New-PSFieldKitContext.ps1
-. $PSScriptRoot\Private\Test-PSFieldKitTarget.ps1
+Get-ChildItem `
+    -Path "$PSScriptRoot\Private" `
+    -Filter "*.ps1" `
+    -File `
+    -Recurse |
+    Sort-Object FullName |
+    ForEach-Object {
+        . $_.FullName
+    }
+
+# Public
+Get-ChildItem `
+    -Path "$PSScriptRoot\Public" `
+    -Filter "*.ps1" `
+    -File `
+    -Recurse |
+    Sort-Object FullName |
+    ForEach-Object {
+        . $_.FullName
+    }

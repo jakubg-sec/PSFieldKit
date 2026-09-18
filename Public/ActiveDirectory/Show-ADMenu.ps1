@@ -1,5 +1,15 @@
 function Show-ADMenu {
 
+    try {
+        Import-Module ActiveDirectory -ErrorAction Stop
+    }
+    catch {
+        Write-Host "`nActive Directory PowerShell module is not installed." -ForegroundColor Red
+        Write-Host "Install RSAT / Active Directory tools and try again." -ForegroundColor Yellow
+        Pause
+        return
+    }
+
     while ($true) {
 
         Clear-Host
@@ -9,16 +19,18 @@ function Show-ADMenu {
         Write-Host "|                 PSFieldKit                   |" -ForegroundColor Cyan
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|                                              |"
-        Write-Host "|  [1] User Management                         |"
-        Write-Host "|  [2] Computer Management                     |"
-        Write-Host "|  [3] Group Management                        |"
-        Write-Host "|  [4] Organizational Units                    |"
-        Write-Host "|  [5] Domain Controllers                      |"
-        Write-Host "|  [6] Group Policy                            |"
-        Write-Host "|  [7] Replication                             |"
-        Write-Host "|  [8] DNS                                     |"
-        Write-Host "|  [9] AD Diagnostics                          |"
-        Write-Host "| [10] Search Active Directory                 |"
+        Write-Host "|  [1] Domain & Forest Information             |"
+        Write-Host "|  [2] User Management                         |"
+        Write-Host "|  [3] Computer Management                     |"
+        Write-Host "|  [4] Group Management                        |"
+        Write-Host "|  [5] Organizational Units                    |"
+        Write-Host "|  [6] Domain Controllers                      |"
+        Write-Host "|  [7] Group Policy                            |"
+        Write-Host "|  [8] Replication                             |"
+        Write-Host "|  [9] Trusts                                  |"
+        Write-Host "| [10] AD Diagnostics                          |"
+        Write-Host "| [11] Search Active Directory                 |"
+        Write-Host "| [12] DNS                                     |"
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"
         Write-Host "|                                              |"
@@ -29,43 +41,51 @@ function Show-ADMenu {
         switch ($Choice) {
 
             '1' {
-                # Show-ADUserMenu
+                Show-ADDomainForestMenu
             }
 
             '2' {
-                # Show-ADComputerMenu
+                Show-ADUserMenu
             }
 
             '3' {
-                # Show-ADGroupMenu
+                Show-ADComputerMenu
             }
 
             '4' {
-                # Show-ADOrganizationalUnitMenu
+                Show-ADGroupMenu
             }
 
             '5' {
-                # Show-ADDomainControllerMenu
+                Show-ADOrganizationalUnitMenu
             }
 
             '6' {
-                # Show-ADGPOMenu
+                Show-ADDomainControllerMenu
             }
 
             '7' {
-                # Show-ADReplicationMenu
+                Show-ADGPOMenu
             }
 
             '8' {
-                # Show-ADDnsMenu
+                Show-ADReplicationMenu
             }
 
             '9' {
-                # Show-ADDiagnosticsMenu
+                Show-ADTrustMenu
             }
 
             '10' {
-                # Search-ActiveDirectory
+                Show-ADDiagnosticsMenu
+            }
+
+            '11' {
+                Search-ActiveDirectory
+            }
+
+            '12' {
+                Show-ADDnsMenu
             }
 
             '0' {
