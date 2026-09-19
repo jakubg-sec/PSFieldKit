@@ -12,8 +12,6 @@ The project is implemented as a PowerShell script module (`PSFieldKit.psm1`) wit
 
 The project is currently organized as an interactive administration toolkit rather than a conventional parameter-driven PowerShell command module.
 
-The module manifest reports version **0.1.0**. The interactive main menu displays **PSFieldKit v1.0**.
-
 ---
 
 ## Main goals
