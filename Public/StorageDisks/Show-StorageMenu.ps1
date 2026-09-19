@@ -1,12 +1,10 @@
 function Show-StorageMenu {
-
     param(
         [Parameter(Mandatory)]
         [PSCustomObject]$Context
     )
 
     while ($true) {
-
         Clear-Host
 
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
@@ -23,7 +21,6 @@ function Show-StorageMenu {
         Write-Host "|  [7] Disk Usage                              |"
         Write-Host "|  [8] Storage Spaces                          |"
         Write-Host "|  [9] Rescan Disks                            |"
-        Write-Host "| [10] Disk Management                         |"
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"
         Write-Host "|                                              |"
@@ -34,45 +31,49 @@ function Show-StorageMenu {
         $Choice = Read-Host "`nSelect option"
 
         switch ($Choice) {
-
             '1' {
-                # Get-DiskInformation
+                Get-DiskInformation -Context $Context
+                Pause
             }
 
             '2' {
-                # Get-PartitionInformation
+                Get-PartitionInformation -Context $Context
+                Pause
             }
 
             '3' {
-                # Get-VolumeInformation
+                Get-VolumeInformation -Context $Context
+                Pause
             }
 
             '4' {
-                # Get-FreeSpace
+                Get-FreeSpace -Context $Context
+                Pause
             }
 
             '5' {
-                # Get-DiskHealth
+                Get-DiskHealth -Context $Context
+                Pause
             }
 
             '6' {
-                # Get-MountedDrive
+                Get-MountedDrives -Context $Context
+                Pause
             }
 
             '7' {
-                # Get-DiskUsage
+                Get-DiskUsage -Context $Context
+                Pause
             }
 
             '8' {
-                # Get-StorageSpaces
+                Get-StorageSpaces -Context $Context
+                Pause
             }
 
             '9' {
-                # Update-Disk
-            }
-
-            '10' {
-                # Show-DiskManagement
+                Update-PSFieldKitDisk -Context $Context
+                Pause
             }
 
             '0' {

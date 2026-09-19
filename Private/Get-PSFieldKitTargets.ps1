@@ -27,7 +27,7 @@ function Get-PSFieldKitTargets {
         }
 
         'Range' {
-            $InputValue = Read-Host "Enter IPv4 range (example: 10.1.50.10-10.1.50.50)"
+            $InputValue = Read-Host "Enter IPv4 range (example: 192.168.1.10-192.168.1.50)"
 
             if ($InputValue -notmatch '^\s*(\d{1,3}(?:\.\d{1,3}){3})\s*-\s*(\d{1,3}(?:\.\d{1,3}){3})\s*$') {
                 Write-Host "`nInvalid IPv4 range." -ForegroundColor Red
@@ -86,7 +86,7 @@ function Get-PSFieldKitTargets {
         }
 
         'CIDR' {
-            $InputValue = Read-Host "Enter IPv4 network (example: 10.1.50.0/24)"
+            $InputValue = Read-Host "Enter IPv4 network (example: 192.168.1.0/24)"
 
             if ($InputValue -notmatch '^\s*(\d{1,3}(?:\.\d{1,3}){3})\/(\d{1,2})\s*$') {
                 Write-Host "`nInvalid CIDR notation." -ForegroundColor Red
