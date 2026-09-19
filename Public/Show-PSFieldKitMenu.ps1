@@ -77,7 +77,7 @@ function Show-PSFieldKitMenu {
             }
 
             '8' {
-                $Context = New-PSFieldKitContext
+                $Context = New-PSFieldKitContext -AllowMultipleTargets
 
                 if ($null -ne $Context) {
                     Show-RemoteAdministrationMenu -Context $Context
