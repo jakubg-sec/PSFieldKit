@@ -5,6 +5,7 @@ function Show-PSFieldKitMenu {
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|              PSFieldKit v1.0                 |" -ForegroundColor Cyan
         Write-Host "|        PowerShell SysAdmin Toolkit           |" -ForegroundColor Cyan
+        Write-Host "|             Author: jacob                    |" -ForegroundColor DarkGray
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|                                              |"
         Write-Host "|  [1] Computer Information                    |"
@@ -94,11 +95,13 @@ function Show-PSFieldKitMenu {
 
             '0' {
                 Write-Host "`nExiting PSFieldKit..." -ForegroundColor Yellow
+
                 return
             }
 
             default {
                 Write-Host "`nInvalid option." -ForegroundColor Red
+
                 Start-Sleep -Seconds 1
             }
         }
