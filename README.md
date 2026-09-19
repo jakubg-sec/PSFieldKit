@@ -1748,17 +1748,11 @@ This makes the source tree relatively easy to navigate by task area even though 
 
 # License
 
-No `LICENSE` file or `LicenseUri` value was present in the supplied project metadata.
+PSFieldKit is licensed under the [MIT License](LICENSE).
 
-The module manifest contains the copyright statement:
+Copyright (c) 2026 jacob.
 
-```text
-(c) 2026 jacob. All rights reserved.
-```
-
-However, a copyright statement is **not** a substitute for an explicit open-source license.
-
-> **License placeholder:** choose and add an explicit license file (for example `LICENSE`) before publishing the repository as an open-source project. Update `PSFieldKit.psd1` metadata accordingly if required.
+See the [LICENSE](LICENSE) file for the full license text.
 
 ---
 
