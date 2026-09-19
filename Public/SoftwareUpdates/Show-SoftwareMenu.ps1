@@ -1,12 +1,10 @@
 function Show-SoftwareMenu {
-
     param(
         [Parameter(Mandatory)]
         [PSCustomObject]$Context
     )
 
     while ($true) {
-
         Clear-Host
 
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
@@ -17,62 +15,71 @@ function Show-SoftwareMenu {
         Write-Host "|  [1] Installed Software                      |"
         Write-Host "|  [2] Software Details                        |"
         Write-Host "|  [3] Windows Features                        |"
-        Write-Host "|  [4] Windows Services                        |"
-        Write-Host "|  [5] Windows Update Status                   |"
-        Write-Host "|  [6] Available Updates                       |"
-        Write-Host "|  [7] Installed Updates                       |"
-        Write-Host "|  [8] Update History                          |"
-        Write-Host "|  [9] Check for Updates                       |"
-        Write-Host "| [10] Pending Reboot Status                   |"
+        Write-Host "|  [4] Windows Update Status                   |"
+        Write-Host "|  [5] Available Updates                       |"
+        Write-Host "|  [6] Installed Updates                       |"
+        Write-Host "|  [7] Update History                          |"
+        Write-Host "|  [8] Check for Updates                       |"
+        Write-Host "|  [9] Pending Reboot Status                   |"
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"
         Write-Host "|                                              |"
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
 
-        Write-Host "`nTarget: $($Context.ComputerName)" -ForegroundColor Yellow
+        if ($Context.IsMultiTarget) {
+            Write-Host "`nTarget: Multiple Computers ($($Context.Targets.Count) hosts)" `
+                -ForegroundColor Yellow
+        }
+        else {
+            Write-Host "`nTarget: $($Context.ComputerName)" -ForegroundColor Yellow
+        }
 
         $Choice = Read-Host "`nSelect option"
 
         switch ($Choice) {
-
             '1' {
-                # Get-InstalledSoftware
+                Get-InstalledSoftware -Context $Context
+                Pause
             }
 
             '2' {
-                # Get-SoftwareDetails
+                Get-SoftwareDetails -Context $Context
+                Pause
             }
 
             '3' {
-                # Get-WindowsFeatureInformation
+                Get-WindowsFeatureInformation -Context $Context
+                Pause
             }
 
             '4' {
-                # Get-WindowsServiceInformation
+                Get-WindowsUpdateStatus -Context $Context
+                Pause
             }
 
             '5' {
-                # Get-WindowsUpdateStatus
+                Get-AvailableUpdates -Context $Context
+                Pause
             }
 
             '6' {
-                # Get-AvailableUpdates
+                Get-InstalledUpdates -Context $Context
+                Pause
             }
 
             '7' {
-                # Get-InstalledUpdates
+                Get-UpdateHistory -Context $Context
+                Pause
             }
 
             '8' {
-                # Get-UpdateHistory
+                Find-WindowsUpdates -Context $Context
+                Pause
             }
 
             '9' {
-                # Find-WindowsUpdates
-            }
-
-            '10' {
-                # Get-PendingRebootStatus
+                Get-PendingRebootStatus -Context $Context
+                Pause
             }
 
             '0' {
