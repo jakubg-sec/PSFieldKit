@@ -1,12 +1,10 @@
 function Show-EventLogMenu {
-
     param(
         [Parameter(Mandatory)]
         [PSCustomObject]$Context
     )
 
     while ($true) {
-
         Clear-Host
 
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
@@ -17,62 +15,70 @@ function Show-EventLogMenu {
         Write-Host "|  [1] System Events                           |"
         Write-Host "|  [2] Application Events                      |"
         Write-Host "|  [3] Security Events                         |"
-        Write-Host "|  [4] Windows PowerShell Events               |"
-        Write-Host "|  [5] Microsoft-Windows Events                |"
+        Write-Host "|  [4] PowerShell Events                       |"
+        Write-Host "|  [5] Windows Event Channels                  |"
         Write-Host "|  [6] Search Events                           |"
-        Write-Host "|  [7] Export Event Logs                       |"
-        Write-Host "|  [8] Clear Event Logs                        |"
-        Write-Host "|  [9] Event Log Configuration                 |"
-        Write-Host "| [10] Export Logs                             |"
+        Write-Host "|  [7] Event Log Information                   |"
+        Write-Host "|  [8] Clear Event Log                         |"
+        Write-Host "|  [9] Export Event Logs                       |"
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"
         Write-Host "|                                              |"
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
 
-        Write-Host "`nTarget: $($Context.ComputerName)" -ForegroundColor Yellow
+        if ($Context.IsMultiTarget) {
+            Write-Host "`nTarget: Multiple Computers ($($Context.Targets.Count) hosts)" -ForegroundColor Yellow
+        }
+        else {
+            Write-Host "`nTarget: $($Context.ComputerName)" -ForegroundColor Yellow
+        }
 
         $Choice = Read-Host "`nSelect option"
 
         switch ($Choice) {
-
             '1' {
-                # Get-SystemEventLog
+                Get-SystemEventLog -Context $Context
+                Pause
             }
 
             '2' {
-                # Get-ApplicationEventLog
+                Get-ApplicationEventLog -Context $Context
+                Pause
             }
 
             '3' {
-                # Get-SecurityEventLog
+                Get-SecurityEventLog -Context $Context
+                Pause
             }
 
             '4' {
-                # Get-PowerShellEventLog
+                Get-PowerShellEventLog -Context $Context
+                Pause
             }
 
             '5' {
-                # Get-WindowsEventLog
+                Get-WindowsEventChannels -Context $Context
+                Pause
             }
 
             '6' {
-                # Search-EventLog
+                Search-PSFieldKitEventLog -Context $Context
+                Pause
             }
 
             '7' {
-                # Export-EventLog
+                Get-EventLogInformation -Context $Context
+                Pause
             }
 
             '8' {
-                # Clear-EventLog
+                Clear-PSFieldKitEventLog -Context $Context
+                Pause
             }
 
             '9' {
-                # Get-EventLogConfiguration
-            }
-            
-            '10' {
-                # Export-EventLogsArchive
+                Export-EventLogs -Context $Context
+                Pause
             }
 
             '0' {

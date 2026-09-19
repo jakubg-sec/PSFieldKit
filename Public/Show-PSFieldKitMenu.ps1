@@ -1,7 +1,5 @@
 function Show-PSFieldKitMenu {
-
     while ($true) {
-
         Clear-Host
 
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
@@ -26,7 +24,6 @@ function Show-PSFieldKitMenu {
         $Choice = Read-Host "`nSelect option"
 
         switch ($Choice) {
-
             '1' {
                 $Context = New-PSFieldKitContext
 
@@ -56,7 +53,7 @@ function Show-PSFieldKitMenu {
             }
 
             '5' {
-                $Context = New-PSFieldKitContext
+                $Context = New-PSFieldKitContext -AllowMultipleTargets
 
                 if ($null -ne $Context) {
                     Show-EventLogMenu -Context $Context
