@@ -35,39 +35,48 @@ function Show-ProcessServiceMenu {
         switch ($Choice) {
 
             '1' {
-                # Get process information
+                Get-ProcessInformation -Context $Context
+                Pause
             }
 
             '2' {
-                # Get running processes
+                Get-RunningProcesses -Context $Context
+                Pause
             }
 
             '3' {
-                # Get process details
+                Get-ProcessDetails -Context $Context
+                Pause
             }
 
             '4' {
-                # Get service information
+                Get-ServiceInformation -Context $Context
+                Pause
             }
 
             '5' {
-                # Get running services
+                Get-RunningServices -Context $Context
+                Pause
             }
 
             '6' {
-                # Start service
+                Start-PSFieldKitService -Context $Context
+                Pause
             }
 
             '7' {
-                # Stop service
+                Stop-PSFieldKitService -Context $Context
+                Pause
             }
 
             '8' {
-                # Restart service
+                Restart-PSFieldKitService -Context $Context
+                Pause
             }
 
             '9' {
-                # Get service dependencies
+                Get-ServiceDependencies -Context $Context
+                Pause
             }
 
             '0' {
