@@ -32,7 +32,7 @@ function Convert-PSFieldKitExchangeMailbox {
     }
 
     Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
-    Write-Host "|                Convert Mailbox               |" -ForegroundColor Cyan
+    Write-Host "|               Convert Mailbox                |" -ForegroundColor Cyan
     Write-Host "|                 PSFieldKit                   |" -ForegroundColor Cyan
     Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
     Write-Host "|                                              |"
@@ -52,166 +52,174 @@ function Convert-PSFieldKitExchangeMailbox {
 
     try {
         $Mailbox = Get-Mailbox -Identity $MailboxIdentity -ErrorAction Stop
-
-        $CurrentType = [string]$Mailbox.RecipientTypeDetails
-
+    }
+    catch {
         Write-Host ""
-        Write-Host "Mailbox selected:" -ForegroundColor Cyan
-        Write-Host "  Name         : $($Mailbox.DisplayName)"
-        Write-Host "  Alias        : $($Mailbox.Alias)"
-        Write-Host "  Primary SMTP : $($Mailbox.PrimarySmtpAddress)"
-        Write-Host "  Current Type : $CurrentType"
-        Write-Host ""
+        Write-Host "Failed to find mailbox." -ForegroundColor Red
+        Write-Host $_.Exception.Message -ForegroundColor Yellow
+        Read-Host "`nPress Enter to continue" | Out-Null
+        return
+    }
 
-        Write-Host "Select target mailbox type:" -ForegroundColor Cyan
-        Write-Host ""
-        Write-Host "  [1] Regular"
-        Write-Host "  [2] Shared"
-        Write-Host "  [3] Room"
-        Write-Host "  [4] Equipment"
-        Write-Host ""
-        Write-Host "  [0] Back"
+    $CurrentType = [string]$Mailbox.RecipientTypeDetails
+    $CurrentMailboxType = $null
 
-        $Choice = Read-Host "`nSelect option"
+    switch ($CurrentType) {
+        "UserMailbox" {
+            $CurrentMailboxType = "Regular"
+        }
+        "SharedMailbox" {
+            $CurrentMailboxType = "Shared"
+        }
+        "RoomMailbox" {
+            $CurrentMailboxType = "Room"
+        }
+        "EquipmentMailbox" {
+            $CurrentMailboxType = "Equipment"
+        }
+        default {
+            $CurrentMailboxType = $CurrentType
+        }
+    }
 
-        switch ($Choice) {
-            "1" {
-                $TargetType = "Regular"
-            }
+    $DisplayCurrentType = $CurrentType
 
-            "2" {
-                $TargetType = "Shared"
-            }
+    if (-not [string]::IsNullOrWhiteSpace($CurrentMailboxType)) {
+        $DisplayCurrentType = $CurrentMailboxType
+    }
 
-            "3" {
-                $TargetType = "Room"
-            }
+    Write-Host ""
+    Write-Host "Mailbox selected:" -ForegroundColor Cyan
+    Write-Host "  Name         : $($Mailbox.DisplayName)"
+    Write-Host "  Alias        : $($Mailbox.Alias)"
+    Write-Host "  Primary SMTP : $($Mailbox.PrimarySmtpAddress)"
+    Write-Host "  Current Type : $DisplayCurrentType"
+    Write-Host ""
 
-            "4" {
-                $TargetType = "Equipment"
-            }
+    Write-Host "Select new mailbox type:" -ForegroundColor Cyan
+    Write-Host ""
+    Write-Host "  [1] Regular"
+    Write-Host "  [2] Shared"
+    Write-Host "  [3] Room"
+    Write-Host "  [4] Equipment"
+    Write-Host "  [0] Back"
+    Write-Host ""
 
-            "0" {
-                return
-            }
+    $Choice = Read-Host "Select option"
 
-            default {
-                Write-Host ""
-                Write-Host "Invalid option." -ForegroundColor Red
-                Read-Host "`nPress Enter to continue" | Out-Null
-                return
-            }
+    $NewType = $null
+
+    switch ($Choice) {
+        "1" {
+            $NewType = "Regular"
         }
 
-        $CurrentTypeMap = @{
-            "UserMailbox"       = "Regular"
-            "SharedMailbox"     = "Shared"
-            "RoomMailbox"       = "Room"
-            "EquipmentMailbox"  = "Equipment"
+        "2" {
+            $NewType = "Shared"
         }
 
-        $CurrentMailboxType = $CurrentTypeMap[$CurrentType]
+        "3" {
+            $NewType = "Room"
+        }
 
-        if ($CurrentMailboxType -eq $TargetType) {
+        "4" {
+            $NewType = "Equipment"
+        }
+
+        "0" {
+            return
+        }
+
+        default {
             Write-Host ""
-            Write-Host "The mailbox is already configured as $TargetType." -ForegroundColor Yellow
+            Write-Host "Invalid option." -ForegroundColor Red
+            Read-Host "`nPress Enter to continue" | Out-Null
+            return
+        }
+    }
+
+    if ($NewType -eq $CurrentMailboxType) {
+        Write-Host ""
+        Write-Host "The mailbox is already configured as $NewType." -ForegroundColor Yellow
+        Read-Host "`nPress Enter to continue" | Out-Null
+        return
+    }
+
+    Write-Host ""
+    Write-Host "Conversion:" -ForegroundColor Cyan
+    Write-Host "  Current : $DisplayCurrentType"
+    Write-Host "  Target  : $NewType"
+    Write-Host ""
+
+    $Password = $null
+    $ResetPasswordOnNextLogon = $false
+
+    if ($NewType -eq "Regular") {
+        Write-Host "A Regular mailbox requires an AD account password." -ForegroundColor Yellow
+        Write-Host ""
+
+        $PasswordPlainText = Read-Host "Enter new password"
+
+        if ([string]::IsNullOrWhiteSpace($PasswordPlainText)) {
+            Write-Host ""
+            Write-Host "Password cannot be empty." -ForegroundColor Red
             Read-Host "`nPress Enter to continue" | Out-Null
             return
         }
 
+        $Password = ConvertTo-SecureString $PasswordPlainText -AsPlainText -Force
+
         Write-Host ""
-        Write-Host "Conversion:" -ForegroundColor Cyan
-        Write-Host "  Mailbox : $($Mailbox.DisplayName)"
-        Write-Host "  Current : $($CurrentMailboxType ?? $CurrentType)"
-        Write-Host "  Target  : $TargetType"
+        $ResetChoice = Read-Host "Require password change at next logon? (Y/N)"
+
+        if ($ResetChoice -match "^(Y|y)$") {
+            $ResetPasswordOnNextLogon = $true
+        }
+    }
+    else {
+        Write-Host "Converting this mailbox to $NewType may disable the associated AD account." -ForegroundColor Yellow
+        Write-Host "Verify the resulting account state after the conversion." -ForegroundColor Yellow
+    }
+
+    Write-Host ""
+    Write-Host "WARNING: Mailbox type conversion changes how the mailbox is treated by Exchange." -ForegroundColor Yellow
+    Write-Host "Verify the target type before continuing." -ForegroundColor Yellow
+    Write-Host ""
+
+    $Confirmation = Read-Host "Type CONVERT to continue"
+
+    if ($Confirmation -cne "CONVERT") {
         Write-Host ""
+        Write-Host "Mailbox conversion cancelled." -ForegroundColor Yellow
+        return
+    }
 
-        if ($TargetType -eq "Regular") {
-            Write-Host "A password is required when converting to a regular mailbox." -ForegroundColor Yellow
-            Write-Host ""
-
-            $Password = Read-Host "Enter mailbox password" -AsSecureString
-
-            $ResetPasswordInput = Read-Host "Require password change on next logon? (Y/N)"
-            $ResetPasswordOnNextLogon = $false
-
-            if ($ResetPasswordInput -match "^[Yy]$") {
-                $ResetPasswordOnNextLogon = $true
-            }
-
-            Write-Host ""
-            Write-Host "WARNING: The associated AD account will be used as a regular user account." -ForegroundColor Yellow
-            Write-Host ""
-
-            $Confirmation = Read-Host "Type CONVERT to continue"
-
-            if ($Confirmation -cne "CONVERT") {
-                Write-Host ""
-                Write-Host "Mailbox conversion cancelled." -ForegroundColor Yellow
-                return
-            }
-
-            $Parameters = @{
-                Identity                = $Mailbox.Identity
-                Type                    = "Regular"
-                Password                = $Password
-                ResetPasswordOnNextLogon = $ResetPasswordOnNextLogon
-                ErrorAction             = "Stop"
-            }
-
-            Set-Mailbox @Parameters
+    try {
+        $Parameters = @{
+            Identity   = $Mailbox.Identity
+            Type       = $NewType
+            Confirm    = $false
+            ErrorAction = "Stop"
         }
-        else {
-            Write-Host ""
 
-            if ($TargetType -eq "Shared") {
-                Write-Host "The mailbox will be converted to a shared mailbox." -ForegroundColor Yellow
-                Write-Host "The associated AD account will be disabled." -ForegroundColor Yellow
-            }
-            elseif ($TargetType -eq "Room") {
-                Write-Host "The mailbox will be converted to a room mailbox." -ForegroundColor Yellow
-                Write-Host "The associated AD account will be disabled." -ForegroundColor Yellow
-            }
-            elseif ($TargetType -eq "Equipment") {
-                Write-Host "The mailbox will be converted to an equipment mailbox." -ForegroundColor Yellow
-                Write-Host "The associated AD account will be disabled." -ForegroundColor Yellow
-            }
-
-            Write-Host ""
-
-            $Confirmation = Read-Host "Type CONVERT to continue"
-
-            if ($Confirmation -cne "CONVERT") {
-                Write-Host ""
-                Write-Host "Mailbox conversion cancelled." -ForegroundColor Yellow
-                return
-            }
-
-            $Parameters = @{
-                Identity    = $Mailbox.Identity
-                Type        = $TargetType
-                ErrorAction = "Stop"
-            }
-
-            Set-Mailbox @Parameters
+        if ($NewType -eq "Regular") {
+            $Parameters["Password"] = $Password
+            $Parameters["ResetPasswordOnNextLogon"] = $ResetPasswordOnNextLogon
         }
+
+        Set-Mailbox @Parameters
 
         Write-Host ""
         Write-Host "Mailbox converted successfully." -ForegroundColor Green
-
-        $UpdatedMailbox = Get-Mailbox -Identity $Mailbox.Identity -ErrorAction Stop
-
         Write-Host ""
-        Write-Host "Mailbox information:" -ForegroundColor Cyan
-        Write-Host "  Name         : $($UpdatedMailbox.DisplayName)"
-        Write-Host "  Alias        : $($UpdatedMailbox.Alias)"
-        Write-Host "  Primary SMTP : $($UpdatedMailbox.PrimarySmtpAddress)"
-        Write-Host "  New Type     : $($UpdatedMailbox.RecipientTypeDetails)"
+        Write-Host "New mailbox type: $NewType" -ForegroundColor Cyan
     }
     catch {
         Write-Host ""
         Write-Host "Failed to convert mailbox." -ForegroundColor Red
         Write-Host $_.Exception.Message -ForegroundColor Yellow
+        Read-Host "`nPress Enter to continue" | Out-Null
+        return
     }
 
     Read-Host "`nPress Enter to continue" | Out-Null

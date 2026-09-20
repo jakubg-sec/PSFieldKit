@@ -69,7 +69,7 @@ function Get-PSFieldKitExchangeMailboxStatistics {
             $DisplayName = $DisplayName.Substring(0, 32) + "..."
         }
 
-        Write-Host ("|  Mailbox: {0,-34}|" -f $DisplayName) -ForegroundColor White
+        Write-Host ("|  Mailbox: {0,-35}|" -f $DisplayName) -ForegroundColor White
         Write-Host "|                                              |"
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|                                              |"
@@ -137,9 +137,9 @@ function Get-PSFieldKitExchangeMailboxStatistics {
         Write-Host ("|  Storage Status    : {0,-25}|" -f $StorageLimitStatus) -ForegroundColor $StorageColor
 
         Write-Host "|                                              |"
-        Write-Host "|  ACTIVITY                                     |" -ForegroundColor DarkCyan
-        Write-Host ("|  Last Logon        : {0,-25}|" -f $LastLogonTime) -ForegroundColor White
-        Write-Host ("|  Last Logoff       : {0,-25}|" -f $LastLogoffTime) -ForegroundColor White
+        Write-Host "|  ACTIVITY                                    |" -ForegroundColor DarkCyan
+        Write-Host ("|  Last Logon        : {0,-24}|" -f $LastLogonTime) -ForegroundColor White
+        Write-Host ("|  Last Logoff       : {0,-24}|" -f $LastLogoffTime) -ForegroundColor White
 
         Write-Host "|                                              |"
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan

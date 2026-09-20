@@ -35,7 +35,7 @@ function New-PSFieldKitExchangeMailbox {
     Write-Host ("|  Server : {0,-35}|" -f $ServerName) -ForegroundColor White
     Write-Host "|                                              |"
     Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
-    Write-Host "|                                              |"
+    Write-Host ""
 
     $Name = Read-Host "Name"
 
