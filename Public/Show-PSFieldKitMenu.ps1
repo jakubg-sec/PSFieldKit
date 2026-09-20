@@ -3,7 +3,7 @@ function Show-PSFieldKitMenu {
         Clear-Host
 
         Write-Host "+------------------------------------------------------+" -ForegroundColor DarkCyan
-        Write-Host "|                  PSFieldKit v1.0.0                   |" -ForegroundColor Cyan
+        Write-Host "|                  PSFieldKit v1.1.0                   |" -ForegroundColor Cyan
         Write-Host "|              PowerShell SysAdmin Toolkit             |" -ForegroundColor Cyan
         Write-Host "|                    Author: jacob                     |" -ForegroundColor DarkGray
         Write-Host "+------------------------------------------------------+" -ForegroundColor DarkCyan
@@ -26,6 +26,7 @@ function Show-PSFieldKitMenu {
         Write-Host "|  [8] Remote Administration                           |"
         Write-Host "|  [9] Software & Updates                              |"
         Write-Host "| [10] Security Auditing                               |"
+        Write-Host "| [11] Exchange                                        |"
         Write-Host "|                                                      |"
         Write-Host "+------------------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|  [0] Exit                                            |"
@@ -108,6 +109,11 @@ function Show-PSFieldKitMenu {
                 if ($null -ne $Context) {
                     Show-SecurityAuditingMenu -Context $Context
                 }
+            }
+
+            '11' {
+                    Show-ExchangeMenu
+                    Pause
             }
 
             '66' {

@@ -15,15 +15,15 @@ function Show-SecurityAuditingMenu {
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|                                              |"
 
-        Write-PSFieldKitMenuOption -Number '1' -Text 'Security Audit Overview' -Enabled $false
-        Write-PSFieldKitMenuOption -Number '2' -Text 'Suspicious Activity Analysis' -Enabled $false
-        Write-PSFieldKitMenuOption -Number '3' -Text 'Authentication Audit' -Enabled $false
-        Write-PSFieldKitMenuOption -Number '4' -Text 'Privileged Account Activity' -Enabled $false
-        Write-PSFieldKitMenuOption -Number '5' -Text 'Persistence & Autoruns Audit' -Enabled $false
-        Write-PSFieldKitMenuOption -Number '6' -Text 'PowerShell Activity Audit' -Enabled $false
-        Write-PSFieldKitMenuOption -Number '7' -Text 'Audit Policy & Logging Check' -Enabled $false
-        Write-PSFieldKitMenuOption -Number '8' -Text 'Generate Security Report' -Enabled $false
-        Write-PSFieldKitMenuOption -Number '9' -Text 'Analyze Archived Event Log' -Enabled $false
+        Write-PSFieldKitMenuOption -Number '1' -Text 'Security Audit Overview' -Enabled $true
+        Write-PSFieldKitMenuOption -Number '2' -Text 'Suspicious Activity Analysis' -Enabled $true
+        Write-PSFieldKitMenuOption -Number '3' -Text 'Authentication Audit' -Enabled $true
+        Write-PSFieldKitMenuOption -Number '4' -Text 'Privileged Account Activity' -Enabled $true
+        Write-PSFieldKitMenuOption -Number '5' -Text 'Persistence & Autoruns Audit' -Enabled $true
+        Write-PSFieldKitMenuOption -Number '6' -Text 'PowerShell Activity Audit' -Enabled $true
+        Write-PSFieldKitMenuOption -Number '7' -Text 'Audit Policy & Logging Check' -Enabled $true
+        Write-PSFieldKitMenuOption -Number '8' -Text 'Generate Security Report' -Enabled $true
+        Write-PSFieldKitMenuOption -Number '9' -Text 'Analyze Archived Event Log' -Enabled $CanUseArchivedLog
 
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"

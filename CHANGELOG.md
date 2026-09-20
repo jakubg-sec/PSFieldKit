@@ -83,6 +83,24 @@ and this project follows [Semantic Versioning](https://semver.org/).
 * Improved menu layout and navigation.
 * Made small usability improvements throughout the menus.
 
+## [1.1.0] - 2026-09-20
+
+### Added
+
+* Security Audit Overview.
+* Suspicious activity analysis.
+* Authentication auditing.
+* Privileged account activity auditing.
+* Persistence and autoruns auditing.
+* PowerShell activity auditing.
+* Audit policy and logging checks.
+* Security report generation.
+* Archived Event Log analysis.
+* Security auditing for local computers.
+* Security auditing for single remote computers.
+* Security auditing for multiple remote targets.
+* Configurable security analysis time ranges.
+* Security event analysis and investigation-focused summaries.
 
 ---
 
