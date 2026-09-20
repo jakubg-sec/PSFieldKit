@@ -113,7 +113,6 @@ function Show-PSFieldKitMenu {
 
             '11' {
                     Show-ExchangeMenu
-                    Pause
             }
 
             '66' {
