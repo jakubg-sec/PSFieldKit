@@ -1,31 +1,35 @@
-
 function Show-PSFieldKitMenu {
     while ($true) {
         Clear-Host
 
-        Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
-        Write-Host "|             PSFieldKit v1.0.0                |" -ForegroundColor Cyan
-        Write-Host "|         PowerShell SysAdmin Toolkit          |" -ForegroundColor Cyan
-        Write-Host "|                                              |"
-        Write-Host "|  With great power there must also come       |" -ForegroundColor DarkGray
-        Write-Host "|  great responsibility.                       |" -ForegroundColor DarkGray
-        Write-Host "|                                              |"
-        Write-Host "|               Author: jacob                  |" -ForegroundColor DarkGray
-        Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
-        Write-Host "|                                              |"
-        Write-Host "|  [1] Computer Information                    |"
-        Write-Host "|  [2] Network Diagnostics                     |"
-        Write-Host "|  [3] Active Directory                        |"
-        Write-Host "|  [4] Processes & Services                    |"
-        Write-Host "|  [5] Event Logs                              |"
-        Write-Host "|  [6] Storage & Disks                         |"
-        Write-Host "|  [7] Security                                |"
-        Write-Host "|  [8] Remote Administration                   |"
-        Write-Host "|  [9] Software & Updates                      |"
-        Write-Host "|                                              |"
-        Write-Host "|  [0] Exit                                    |"
-        Write-Host "|                                              |"
-        Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
+        Write-Host "+------------------------------------------------------+" -ForegroundColor DarkCyan
+        Write-Host "|                  PSFieldKit v1.0.0                   |" -ForegroundColor Cyan
+        Write-Host "|              PowerShell SysAdmin Toolkit             |" -ForegroundColor Cyan
+        Write-Host "|                    Author: jacob                     |" -ForegroundColor DarkGray
+        Write-Host "+------------------------------------------------------+" -ForegroundColor DarkCyan
+        Write-Host "|                                                      |"
+        Write-Host "|       `"With great power there must also come         |" -ForegroundColor DarkGray
+        Write-Host "|                great responsibility.`"                |" -ForegroundColor DarkGray
+        Write-Host "|                                                      |"
+        Write-Host "+------------------------------------------------------+" -ForegroundColor DarkCyan
+        Write-Host "|                                                      |"
+        Write-Host "|  SYSTEM                                              |" -ForegroundColor DarkCyan
+        Write-Host "|  [1] Computer Information                            |"
+        Write-Host "|  [2] Network Diagnostics                             |"
+        Write-Host "|  [3] Active Directory                                |"
+        Write-Host "|  [4] Processes & Services                            |"
+        Write-Host "|  [5] Event Logs                                      |"
+        Write-Host "|                                                      |"
+        Write-Host "|  ADMINISTRATION                                      |" -ForegroundColor DarkCyan
+        Write-Host "|  [6] Storage & Disks                                 |"
+        Write-Host "|  [7] Security                                        |"
+        Write-Host "|  [8] Remote Administration                           |"
+        Write-Host "|  [9] Software & Updates                              |"
+        Write-Host "| [10] Security Auditing                               |"
+        Write-Host "|                                                      |"
+        Write-Host "+------------------------------------------------------+" -ForegroundColor DarkCyan
+        Write-Host "|  [0] Exit                                            |"
+        Write-Host "+------------------------------------------------------+" -ForegroundColor DarkCyan
 
         $Choice = Read-Host "`nSelect option"
 
@@ -98,15 +102,30 @@ function Show-PSFieldKitMenu {
                 }
             }
 
+            '10' {
+                $Context = New-PSFieldKitContext -AllowMultipleTargets
+
+                if ($null -ne $Context) {
+                    Show-SecurityAuditingMenu -Context $Context
+                }
+            }
+
+            '66' {
+                Invoke-PSFieldKitOrder66
+            }
+
             '0' {
                 Write-Host "`nExiting PSFieldKit..." -ForegroundColor Yellow
-
+                Start-Sleep -Seconds 1
+                Clear-Host
+                Write-Host "`nThank you for using PSFieldKit!" -ForegroundColor Green
+                Start-Sleep -Seconds 1
+                Clear-Host
                 return
             }
 
             default {
                 Write-Host "`nInvalid option." -ForegroundColor Red
-
                 Start-Sleep -Seconds 1
             }
         }

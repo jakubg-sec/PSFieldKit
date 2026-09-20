@@ -72,6 +72,18 @@ and this project follows [Semantic Versioning](https://semver.org/).
 * Added connectivity validation before accepting remote targets.
 * Added environment-aware handling for remote administration features.
 
+## [1.0.1] - 2026-09-20
+
+### Added
+
+* Added a new **Security Auditing** category and dedicated menu.
+
+### Changed
+
+* Improved menu layout and navigation.
+* Made small usability improvements throughout the menus.
+
+
 ---
 
 ## Versioning
