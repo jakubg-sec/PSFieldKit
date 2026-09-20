@@ -1,11 +1,16 @@
+
 function Show-PSFieldKitMenu {
     while ($true) {
         Clear-Host
 
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
-        Write-Host "|              PSFieldKit v1.0                 |" -ForegroundColor Cyan
-        Write-Host "|        PowerShell SysAdmin Toolkit           |" -ForegroundColor Cyan
-        Write-Host "|             Author: jacob                    |" -ForegroundColor DarkGray
+        Write-Host "|             PSFieldKit v1.0.0                |" -ForegroundColor Cyan
+        Write-Host "|         PowerShell SysAdmin Toolkit          |" -ForegroundColor Cyan
+        Write-Host "|                                              |"
+        Write-Host "|  With great power there must also come       |" -ForegroundColor DarkGray
+        Write-Host "|  great responsibility.                       |" -ForegroundColor DarkGray
+        Write-Host "|                                              |"
+        Write-Host "|               Author: jacob                  |" -ForegroundColor DarkGray
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|                                              |"
         Write-Host "|  [1] Computer Information                    |"
