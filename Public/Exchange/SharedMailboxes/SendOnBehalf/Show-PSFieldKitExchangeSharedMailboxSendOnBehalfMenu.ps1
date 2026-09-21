@@ -1,4 +1,4 @@
-function Show-PSFieldKitExchangeSharedMailboxMenu {
+function Show-PSFieldKitExchangeSharedMailboxSendOnBehalfMenu {
     [CmdletBinding()]
     param(
         [Parameter(Mandatory = $true)]
@@ -33,7 +33,7 @@ function Show-PSFieldKitExchangeSharedMailboxMenu {
         }
 
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
-        Write-Host "|                Shared Mailboxes              |" -ForegroundColor Cyan
+        Write-Host "|      Shared Mailbox - Send on Behalf         |" -ForegroundColor Cyan
         Write-Host "|                 PSFieldKit                   |" -ForegroundColor Cyan
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|                                              |"
@@ -41,16 +41,10 @@ function Show-PSFieldKitExchangeSharedMailboxMenu {
         Write-Host "|                                              |"
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|                                              |"
-        Write-Host "|  SHARED MAILBOXES                            |" -ForegroundColor DarkCyan
-        Write-Host "|  [1] List Shared Mailboxes                   |"
-        Write-Host "|  [2] Search Shared Mailboxes                 |"
-        Write-Host "|  [3] Shared Mailbox Information              |"
-        Write-Host "|  [4] Create Shared Mailbox                   |"
-        Write-Host "|  [5] Remove Shared Mailbox                   |"
-        Write-Host "|  [6] Manage Full Access                      |"
-        Write-Host "|  [7] Manage Send As                          |"
-        Write-Host "|  [8] Manage Send on Behalf                   |"
-        Write-Host "|  [9] Email Addresses                         |"
+        Write-Host "|  SEND ON BEHALF                              |" -ForegroundColor DarkCyan
+        Write-Host "|  [1] View Send on Behalf                     |"
+        Write-Host "|  [2] Add Send on Behalf                      |"
+        Write-Host "|  [3] Remove Send on Behalf                   |"
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"
         Write-Host "|                                              |"
@@ -60,39 +54,15 @@ function Show-PSFieldKitExchangeSharedMailboxMenu {
 
         switch ($Choice) {
             "1" {
-                Get-PSFieldKitExchangeSharedMailbox -ExchangeContext $ExchangeContext
+                Get-PSFieldKitExchangeSharedMailboxSendOnBehalf -ExchangeContext $ExchangeContext
             }
 
             "2" {
-                Search-PSFieldKitExchangeSharedMailbox -ExchangeContext $ExchangeContext
+                Add-PSFieldKitExchangeSharedMailboxSendOnBehalf -ExchangeContext $ExchangeContext
             }
 
             "3" {
-                Show-PSFieldKitExchangeSharedMailboxInformation -ExchangeContext $ExchangeContext
-            }
-
-            "4" {
-                New-PSFieldKitExchangeSharedMailbox -ExchangeContext $ExchangeContext
-            }
-
-            "5" {
-                Remove-PSFieldKitExchangeSharedMailbox -ExchangeContext $ExchangeContext
-            }
-
-            "6" {
-                Show-PSFieldKitExchangeSharedMailboxFullAccessMenu -ExchangeContext $ExchangeContext
-            }
-
-            "7" {
-                Show-PSFieldKitExchangeSharedMailboxSendAsMenu -ExchangeContext $ExchangeContext
-            }
-
-            "8" {
-                Show-PSFieldKitExchangeSharedMailboxSendOnBehalfMenu -ExchangeContext $ExchangeContext
-            }
-
-            "9" {
-                Show-PSFieldKitExchangeSharedMailboxEmailAddressMenu -ExchangeContext $ExchangeContext
+                Remove-PSFieldKitExchangeSharedMailboxSendOnBehalf -ExchangeContext $ExchangeContext
             }
 
             "0" {

@@ -167,8 +167,8 @@ function Show-PSFieldKitExchangeServerInformation {
                     $InactiveColor = "Yellow"
                 }
 
-                Write-Host ("|  Active   : {0,-35}|" -f $ActiveCount) -ForegroundColor $ActiveColor
-                Write-Host ("|  Inactive : {0,-35}|" -f $InactiveCount) -ForegroundColor $InactiveColor
+                Write-Host ("|  Active   : {0,-33}|" -f $ActiveCount) -ForegroundColor $ActiveColor
+                Write-Host ("|  Inactive : {0,-33}|" -f $InactiveCount) -ForegroundColor $InactiveColor
             }
             catch {
 
