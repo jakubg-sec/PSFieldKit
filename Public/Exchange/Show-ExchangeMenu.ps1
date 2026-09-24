@@ -1,9 +1,19 @@
 function Show-ExchangeMenu {
-
     $ExchangeContext = $null
+    $ConnectionRequiredOptions = @(
+        '3'
+        '4'
+        '5'
+        '6'
+        '7'
+        '8'
+        '9'
+        '10'
+        '11'
+        '12'
+    )
 
     while ($true) {
-
         Clear-Host
 
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
@@ -13,41 +23,36 @@ function Show-ExchangeMenu {
         Write-Host "|                                              |"
 
         if ($null -eq $ExchangeContext) {
-
             Write-Host ("|  Server : {0,-35}|" -f "Not connected") -ForegroundColor Yellow
             Write-Host ("|  Status : {0,-35}|" -f "Disconnected") -ForegroundColor Red
         }
         else {
-
             $ServerName = "Unknown"
             $Status = "Disconnected"
 
             if (
-                $ExchangeContext.PSObject.Properties.Name -contains "ServerName" -and
+                $ExchangeContext.PSObject.Properties.Name -contains 'ServerName' -and
                 -not [string]::IsNullOrWhiteSpace([string]$ExchangeContext.ServerName)
             ) {
-
                 $ServerName = [string]$ExchangeContext.ServerName
             }
 
             if (
-                $ExchangeContext.PSObject.Properties.Name -contains "Connected" -and
+                $ExchangeContext.PSObject.Properties.Name -contains 'Connected' -and
                 $ExchangeContext.Connected
             ) {
-
                 $Status = "Connected"
             }
 
             if ($ServerName.Length -gt 35) {
-
                 $ServerName = $ServerName.Substring(0, 32) + "..."
             }
 
-            $StatusColor = "Red"
-
-            if ($Status -eq "Connected") {
-
-                $StatusColor = "Green"
+            $StatusColor = if ($Status -eq 'Connected') {
+                'Green'
+            }
+            else {
+                'Red'
             }
 
             Write-Host ("|  Server : {0,-35}|" -f $ServerName) -ForegroundColor White
@@ -83,357 +88,101 @@ function Show-ExchangeMenu {
 
         $Choice = Read-Host "`nSelect option"
 
+        if ($Choice -in $ConnectionRequiredOptions) {
+            if (-not (Test-PSFieldKitExchangeConnection -ExchangeContext $ExchangeContext)) {
+                continue
+            }
+        }
+
         switch ($Choice) {
-
-            "1" {
-
+            '1' {
                 if ($null -ne $ExchangeContext) {
-
                     if (
-                        $ExchangeContext.PSObject.Properties.Name -contains "Session" -and
+                        $ExchangeContext.PSObject.Properties.Name -contains 'Session' -and
                         $null -ne $ExchangeContext.Session
                     ) {
-
-                        Write-Host ""
-                        Write-Host "An Exchange session is already active." -ForegroundColor Yellow
+                        Write-Host "`nAn Exchange session is already active." -ForegroundColor Yellow
                         Write-Host "Disconnecting the existing session..." -ForegroundColor Yellow
-
                         Disconnect-PSFieldKitExchangeServer -ExchangeContext $ExchangeContext | Out-Null
                     }
 
                     $ExchangeContext = $null
                 }
 
-                Write-Host ""
-
                 $ServerFQDN = Read-Host "Enter Exchange Server FQDN"
 
                 if ([string]::IsNullOrWhiteSpace($ServerFQDN)) {
-
-                    Write-Host ""
-                    Write-Host "Exchange Server FQDN cannot be empty." -ForegroundColor Red
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
+                    Write-Host "`nExchange Server FQDN cannot be empty." -ForegroundColor Red
+                    Read-Host "Press Enter to continue" | Out-Null
                     continue
                 }
 
                 $ExchangeContext = Connect-PSFieldKitExchangeServer -ServerFQDN $ServerFQDN
 
                 if ($null -eq $ExchangeContext) {
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
+                    Read-Host "Press Enter to continue" | Out-Null
                 }
             }
 
-            "2" {
-
+            '2' {
                 if ($null -eq $ExchangeContext) {
-
-                    Write-Host ""
-                    Write-Host "No Exchange session is currently active." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
+                    Write-Host "`nNo Exchange session is currently active." -ForegroundColor Yellow
+                    Read-Host "Press Enter to continue" | Out-Null
                     continue
                 }
 
                 $Disconnected = Disconnect-PSFieldKitExchangeServer -ExchangeContext $ExchangeContext
 
                 if ($Disconnected) {
-
                     $ExchangeContext = $null
                 }
 
-                Read-Host "`nPress Enter to continue" | Out-Null
+                Read-Host "Press Enter to continue" | Out-Null
             }
 
-            "3" {
-
-                if ($null -eq $ExchangeContext) {
-
-                    Write-Host ""
-                    Write-Host "Connect to an Exchange server first." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
-                if (
-                    $ExchangeContext.PSObject.Properties.Name -notcontains "Connected" -or
-                    -not $ExchangeContext.Connected
-                ) {
-
-                    Write-Host ""
-                    Write-Host "The Exchange session is not connected." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
+            '3' {
                 Show-PSFieldKitExchangeServerInformation -ExchangeContext $ExchangeContext
             }
 
-            "4" {
-
-                if ($null -eq $ExchangeContext) {
-
-                    Write-Host ""
-                    Write-Host "Connect to an Exchange server first." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
-                if (
-                    $ExchangeContext.PSObject.Properties.Name -notcontains "Connected" -or
-                    -not $ExchangeContext.Connected
-                ) {
-
-                    Write-Host ""
-                    Write-Host "The Exchange session is not connected." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
+            '4' {
                 Show-PSFieldKitExchangeMailboxMenu -ExchangeContext $ExchangeContext
             }
 
-            "5" {
-
-                if ($null -eq $ExchangeContext) {
-
-                    Write-Host ""
-                    Write-Host "Connect to an Exchange server first." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
-                if (
-                    $ExchangeContext.PSObject.Properties.Name -notcontains "Connected" -or
-                    -not $ExchangeContext.Connected
-                ) {
-
-                    Write-Host ""
-                    Write-Host "The Exchange session is not connected." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
+            '5' {
                 Show-PSFieldKitExchangeSharedMailboxMenu -ExchangeContext $ExchangeContext
             }
 
-            "6" {
-
-                if ($null -eq $ExchangeContext) {
-
-                    Write-Host ""
-                    Write-Host "Connect to an Exchange server first." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
-                if (
-                    $ExchangeContext.PSObject.Properties.Name -notcontains "Connected" -or
-                    -not $ExchangeContext.Connected
-                ) {
-
-                    Write-Host ""
-                    Write-Host "The Exchange session is not connected." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
+            '6' {
                 Show-PSFieldKitExchangeDistributionGroupMenu -ExchangeContext $ExchangeContext
             }
 
-            "7" {
-
-                if ($null -eq $ExchangeContext) {
-
-                    Write-Host ""
-                    Write-Host "Connect to an Exchange server first." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
-                if (
-                    $ExchangeContext.PSObject.Properties.Name -notcontains "Connected" -or
-                    -not $ExchangeContext.Connected
-                ) {
-
-                    Write-Host ""
-                    Write-Host "The Exchange session is not connected." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
+            '7' {
                 Show-PSFieldKitExchangeDatabaseMenu -ExchangeContext $ExchangeContext
             }
 
-            "8" {
-
-                if ($null -eq $ExchangeContext) {
-
-                    Write-Host ""
-                    Write-Host "Connect to an Exchange server first." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
-                if (
-                    $ExchangeContext.PSObject.Properties.Name -notcontains "Connected" -or
-                    -not $ExchangeContext.Connected
-                ) {
-
-                    Write-Host ""
-                    Write-Host "The Exchange session is not connected." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
+            '8' {
                 Show-PSFieldKitExchangeMailFlowMenu -ExchangeContext $ExchangeContext
             }
 
-            "9" {
-
-                if ($null -eq $ExchangeContext) {
-
-                    Write-Host ""
-                    Write-Host "Connect to an Exchange server first." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
-                if (
-                    $ExchangeContext.PSObject.Properties.Name -notcontains "Connected" -or
-                    -not $ExchangeContext.Connected
-                ) {
-
-                    Write-Host ""
-                    Write-Host "The Exchange session is not connected." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
+            '9' {
                 Show-PSFieldKitExchangeDAGMenu -ExchangeContext $ExchangeContext
             }
 
-            "10" {
-
-                if ($null -eq $ExchangeContext) {
-
-                    Write-Host ""
-                    Write-Host "Connect to an Exchange server first." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
-                if (
-                    $ExchangeContext.PSObject.Properties.Name -notcontains "Connected" -or
-                    -not $ExchangeContext.Connected
-                ) {
-
-                    Write-Host ""
-                    Write-Host "The Exchange session is not connected." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
+            '10' {
                 Show-PSFieldKitExchangeCertificateMenu -ExchangeContext $ExchangeContext
             }
 
-            "11" {
-
-                if ($null -eq $ExchangeContext) {
-
-                    Write-Host ""
-                    Write-Host "Connect to an Exchange server first." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
-                if (
-                    $ExchangeContext.PSObject.Properties.Name -notcontains "Connected" -or
-                    -not $ExchangeContext.Connected
-                ) {
-
-                    Write-Host ""
-                    Write-Host "The Exchange session is not connected." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
+            '11' {
                 Show-PSFieldKitExchangeHealthMenu -ExchangeContext $ExchangeContext
             }
 
-            "12" {
-
-                if ($null -eq $ExchangeContext) {
-
-                    Write-Host ""
-                    Write-Host "Connect to an Exchange server first." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
-                if (
-                    $ExchangeContext.PSObject.Properties.Name -notcontains "Connected" -or
-                    -not $ExchangeContext.Connected
-                ) {
-
-                    Write-Host ""
-                    Write-Host "The Exchange session is not connected." -ForegroundColor Yellow
-
-                    Read-Host "`nPress Enter to continue" | Out-Null
-
-                    continue
-                }
-
+            '12' {
                 Show-PSFieldKitExchangeDiagnosticsMenu -ExchangeContext $ExchangeContext
             }
 
-            "0" {
-
+            '0' {
                 if ($null -ne $ExchangeContext) {
-
                     Disconnect-PSFieldKitExchangeServer -ExchangeContext $ExchangeContext | Out-Null
-
                     $ExchangeContext = $null
                 }
 
@@ -441,10 +190,7 @@ function Show-ExchangeMenu {
             }
 
             default {
-
-                Write-Host ""
-                Write-Host "Invalid option." -ForegroundColor Red
-
+                Write-Host "`nInvalid option." -ForegroundColor Red
                 Start-Sleep -Seconds 1
             }
         }

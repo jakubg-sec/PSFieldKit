@@ -10,9 +10,8 @@ function Show-PSFieldKitExchangeDistributionGroupMenu {
         $ExchangeContext.PSObject.Properties.Name -notcontains "Connected" -or
         -not $ExchangeContext.Connected
     ) {
-        Write-Host ""
-        Write-Host "The Exchange session is not connected." -ForegroundColor Yellow
-        Read-Host "`nPress Enter to continue" | Out-Null
+        Write-Host "`nThe Exchange session is not connected." -ForegroundColor Yellow
+        Read-Host "Press Enter to continue" | Out-Null
         return
     }
 
@@ -20,7 +19,6 @@ function Show-PSFieldKitExchangeDistributionGroupMenu {
         Clear-Host
 
         $ServerName = "Unknown"
-
         if (
             $ExchangeContext.PSObject.Properties.Name -contains "ServerName" -and
             -not [string]::IsNullOrWhiteSpace([string]$ExchangeContext.ServerName)
@@ -41,7 +39,6 @@ function Show-PSFieldKitExchangeDistributionGroupMenu {
         Write-Host "|                                              |"
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|                                              |"
-
         Write-Host "|  DISTRIBUTION GROUPS                         |" -ForegroundColor DarkCyan
         Write-Host "|  [1] List Distribution Groups                |"
         Write-Host "|  [2] Search Distribution Groups              |"
@@ -54,6 +51,7 @@ function Show-PSFieldKitExchangeDistributionGroupMenu {
         Write-Host "|  [9] Delivery Management                     |"
         Write-Host "| [10] Message Moderation                      |"
         Write-Host "| [11] Email Addresses                         |"
+        Write-Host "| [12] Show Members                            |"
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"
         Write-Host "|                                              |"
@@ -65,54 +63,44 @@ function Show-PSFieldKitExchangeDistributionGroupMenu {
             "1" {
                 Get-PSFieldKitExchangeDistributionGroup -ExchangeContext $ExchangeContext
             }
-
             "2" {
                 Search-PSFieldKitExchangeDistributionGroup -ExchangeContext $ExchangeContext
             }
-
             "3" {
                 Show-PSFieldKitExchangeDistributionGroupInformation -ExchangeContext $ExchangeContext
             }
-
             "4" {
                 New-PSFieldKitExchangeDistributionGroup -ExchangeContext $ExchangeContext
             }
-
             "5" {
                 Remove-PSFieldKitExchangeDistributionGroup -ExchangeContext $ExchangeContext
             }
-
             "6" {
                 Add-PSFieldKitExchangeDistributionGroupMember -ExchangeContext $ExchangeContext
             }
-
             "7" {
                 Remove-PSFieldKitExchangeDistributionGroupMember -ExchangeContext $ExchangeContext
             }
-
             "8" {
                 Show-PSFieldKitExchangeDistributionGroupOwnerMenu -ExchangeContext $ExchangeContext
             }
-
             "9" {
                 Show-PSFieldKitExchangeDistributionGroupDeliveryManagementMenu -ExchangeContext $ExchangeContext
             }
-
             "10" {
                 Show-PSFieldKitExchangeDistributionGroupModerationMenu -ExchangeContext $ExchangeContext
             }
-
             "11" {
                 Show-PSFieldKitExchangeDistributionGroupEmailAddressMenu -ExchangeContext $ExchangeContext
             }
-
+            "12" {
+                Get-PSFieldKitExchangeDistributionGroupMember -ExchangeContext $ExchangeContext
+            }
             "0" {
                 return
             }
-
             default {
-                Write-Host ""
-                Write-Host "Invalid option." -ForegroundColor Red
+                Write-Host "`nInvalid option." -ForegroundColor Red
                 Start-Sleep -Seconds 1
             }
         }
