@@ -16,12 +16,8 @@ function Get-PSFieldKitTargets {
 
             return @(
                 $InputValue -split ',' |
-                    ForEach-Object {
-                        $_.Trim()
-                    } |
-                    Where-Object {
-                        -not [string]::IsNullOrWhiteSpace($_)
-                    } |
+                    ForEach-Object { $_.Trim() } |
+                    Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
                     Select-Object -Unique
             )
         }
@@ -52,18 +48,18 @@ function Get-PSFieldKitTargets {
             $StartBytes = $StartIP.GetAddressBytes()
             $EndBytes = $EndIP.GetAddressBytes()
 
-            [uint32]$StartValue = (
-                ([uint32]$StartBytes[0] -shl 24) -bor
-                ([uint32]$StartBytes[1] -shl 16) -bor
-                ([uint32]$StartBytes[2] -shl 8) -bor
-                [uint32]$StartBytes[3]
+            [uint64]$StartValue = (
+                ([uint64]$StartBytes[0] * 16777216) +
+                ([uint64]$StartBytes[1] * 65536) +
+                ([uint64]$StartBytes[2] * 256) +
+                [uint64]$StartBytes[3]
             )
 
-            [uint32]$EndValue = (
-                ([uint32]$EndBytes[0] -shl 24) -bor
-                ([uint32]$EndBytes[1] -shl 16) -bor
-                ([uint32]$EndBytes[2] -shl 8) -bor
-                [uint32]$EndBytes[3]
+            [uint64]$EndValue = (
+                ([uint64]$EndBytes[0] * 16777216) +
+                ([uint64]$EndBytes[1] * 65536) +
+                ([uint64]$EndBytes[2] * 256) +
+                [uint64]$EndBytes[3]
             )
 
             if ($StartValue -gt $EndValue) {
@@ -77,9 +73,14 @@ function Get-PSFieldKitTargets {
             }
 
             $Targets = foreach ($Value in $StartValue..$EndValue) {
-                $Bytes = [BitConverter]::GetBytes([uint32]$Value)
-                [Array]::Reverse($Bytes)
-                ([System.Net.IPAddress]::new($Bytes)).ToString()
+                $Byte0 = [byte][math]::Floor($Value / 16777216)
+                $Remaining = $Value % 16777216
+                $Byte1 = [byte][math]::Floor($Remaining / 65536)
+                $Remaining = $Remaining % 65536
+                $Byte2 = [byte][math]::Floor($Remaining / 256)
+                $Byte3 = [byte]($Remaining % 256)
+
+                "{0}.{1}.{2}.{3}" -f $Byte0, $Byte1, $Byte2, $Byte3
             }
 
             return @($Targets)
@@ -88,7 +89,7 @@ function Get-PSFieldKitTargets {
         'CIDR' {
             $InputValue = Read-Host "Enter IPv4 network (example: 192.168.1.0/24)"
 
-            if ($InputValue -notmatch '^\s*(\d{1,3}(?:\.\d{1,3}){3})\/(\d{1,2})\s*$') {
+            if ($InputValue -notmatch '^\s*(\d{1,3}(?:\.\d{1,3}){3})/(\d{1,2})\s*$') {
                 Write-Host "`nInvalid CIDR notation." -ForegroundColor Red
                 return
             }
@@ -112,37 +113,43 @@ function Get-PSFieldKitTargets {
                 return
             }
 
-            $HostCount = [math]::Pow(2, 32 - $PrefixLength)
+            [uint64]$AddressCount = [math]::Pow(2, 32 - $PrefixLength)
 
-            if ($HostCount -gt 4096) {
+            if ($AddressCount -gt 4096) {
                 Write-Host "`nThe selected network contains more than 4096 addresses." -ForegroundColor Red
                 return
             }
 
             $NetworkBytes = $NetworkIP.GetAddressBytes()
 
-            [uint32]$NetworkValue = (
-                ([uint32]$NetworkBytes[0] -shl 24) -bor
-                ([uint32]$NetworkBytes[1] -shl 16) -bor
-                ([uint32]$NetworkBytes[2] -shl 8) -bor
-                [uint32]$NetworkBytes[3]
+            [uint64]$NetworkValue = (
+                ([uint64]$NetworkBytes[0] * 16777216) +
+                ([uint64]$NetworkBytes[1] * 65536) +
+                ([uint64]$NetworkBytes[2] * 256) +
+                [uint64]$NetworkBytes[3]
             )
 
-            [uint32]$Mask = if ($PrefixLength -eq 32) {
-                [uint32]0xFFFFFFFF
+            [uint64]$MaskValue = [math]::Pow(2, 32) - [math]::Pow(2, 32 - $PrefixLength)
+            [uint64]$NetworkAddress = $NetworkValue -band $MaskValue
+
+            if ($PrefixLength -lt 31) {
+                [uint64]$FirstHost = $NetworkAddress + 1
+                [uint64]$LastHost = $NetworkAddress + $AddressCount - 2
             }
             else {
-                [uint32]([uint64]0xFFFFFFFF -shl (32 - $PrefixLength))
+                [uint64]$FirstHost = $NetworkAddress
+                [uint64]$LastHost = $NetworkAddress + $AddressCount - 1
             }
 
-            [uint32]$NetworkAddress = $NetworkValue -band $Mask
+            $Targets = foreach ($Value in $FirstHost..$LastHost) {
+                $Byte0 = [byte][math]::Floor($Value / 16777216)
+                $Remaining = $Value % 16777216
+                $Byte1 = [byte][math]::Floor($Remaining / 65536)
+                $Remaining = $Remaining % 65536
+                $Byte2 = [byte][math]::Floor($Remaining / 256)
+                $Byte3 = [byte]($Remaining % 256)
 
-            $Targets = foreach ($Offset in 0..([int]$HostCount - 1)) {
-                [uint32]$Value = $NetworkAddress + $Offset
-
-                $Bytes = [BitConverter]::GetBytes($Value)
-                [Array]::Reverse($Bytes)
-                ([System.Net.IPAddress]::new($Bytes)).ToString()
+                "{0}.{1}.{2}.{3}" -f $Byte0, $Byte1, $Byte2, $Byte3
             }
 
             return @($Targets)
@@ -158,9 +165,7 @@ function Get-PSFieldKitTargets {
 
             try {
                 $Targets = Get-Content -LiteralPath $FilePath -ErrorAction Stop |
-                    ForEach-Object {
-                        $_.Trim()
-                    } |
+                    ForEach-Object { $_.Trim() } |
                     Where-Object {
                         -not [string]::IsNullOrWhiteSpace($_) -and
                         -not $_.StartsWith('#')

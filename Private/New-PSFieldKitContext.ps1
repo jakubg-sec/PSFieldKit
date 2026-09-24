@@ -6,10 +6,9 @@ function New-PSFieldKitContext {
 
     while ($true) {
         Clear-Host
-
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|              Select Target                   |" -ForegroundColor Cyan
-        Write-Host "|              PSFieldKit                      |" -ForegroundColor Cyan
+        Write-Host "|              PSFieldKit                     |" -ForegroundColor Cyan
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|                                              |"
         Write-Host "|  [1] Local Computer                          |"
@@ -29,13 +28,13 @@ function New-PSFieldKitContext {
         switch ($Choice) {
             '1' {
                 return [PSCustomObject]@{
-                    ComputerName  = $env:COMPUTERNAME
-                    IsRemote      = $false
-                    Session       = $null
-                    Targets       = @(
+                    ComputerName = $env:COMPUTERNAME
+                    IsRemote = $false
+                    Session = $null
+                    Targets = @(
                         [PSCustomObject]@{
                             ComputerName = $env:COMPUTERNAME
-                            IsRemote     = $false
+                            IsRemote = $false
                         }
                     )
                     IsMultiTarget = $false
@@ -60,16 +59,15 @@ function New-PSFieldKitContext {
                 }
 
                 Write-Host "Connection successful." -ForegroundColor Green
-                Start-Sleep -Seconds 1
 
                 return [PSCustomObject]@{
-                    ComputerName  = $ComputerName
-                    IsRemote      = $true
-                    Session       = $null
-                    Targets       = @(
+                    ComputerName = $ComputerName
+                    IsRemote = $true
+                    Session = $null
+                    Targets = @(
                         [PSCustomObject]@{
                             ComputerName = $ComputerName
-                            IsRemote     = $true
+                            IsRemote = $true
                         }
                     )
                     IsMultiTarget = $false
@@ -85,7 +83,6 @@ function New-PSFieldKitContext {
 
                 while ($true) {
                     Clear-Host
-
                     Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
                     Write-Host "|             Multiple Computers               |" -ForegroundColor Cyan
                     Write-Host "|               PSFieldKit                     |" -ForegroundColor Cyan
@@ -134,26 +131,91 @@ function New-PSFieldKitContext {
                         break
                     }
 
-                    if ($null -eq $ComputerNames -or $ComputerNames.Count -eq 0) {
-                        Start-Sleep -Seconds 1
+                    $ComputerNames = @($ComputerNames)
+
+                    if ($ComputerNames.Count -eq 0) {
                         continue
                     }
 
-                    $Targets = foreach ($ComputerName in $ComputerNames) {
-                        Write-Host "`nTesting connection to $ComputerName..." -ForegroundColor Yellow
+                    Write-Host "`nTesting $($ComputerNames.Count) targets..." -ForegroundColor Cyan
 
-                        if (Test-PSFieldKitTarget -ComputerName $ComputerName) {
-                            Write-Host "Connection successful." -ForegroundColor Green
+                    $RunspacePool = [runspacefactory]::CreateRunspacePool(1, 32)
+                    $RunspacePool.Open()
 
-                            [PSCustomObject]@{
-                                ComputerName = $ComputerName
-                                IsRemote     = $true
+                    $Jobs = New-Object System.Collections.ArrayList
+                    $Targets = New-Object System.Collections.ArrayList
+
+                    foreach ($ComputerName in $ComputerNames) {
+                        $PowerShell = [powershell]::Create()
+                        $PowerShell.RunspacePool = $RunspacePool
+
+                        [void]$PowerShell.AddScript({
+                            param($TargetName)
+
+                            try {
+                                Test-WSMan -ComputerName $TargetName -ErrorAction Stop | Out-Null
+
+                                [PSCustomObject]@{
+                                    ComputerName = $TargetName
+                                    Reachable = $true
+                                }
+                            }
+                            catch {
+                                [PSCustomObject]@{
+                                    ComputerName = $TargetName
+                                    Reachable = $false
+                                }
+                            }
+                        }).AddArgument($ComputerName)
+
+                        $AsyncResult = $PowerShell.BeginInvoke()
+
+                        [void]$Jobs.Add([PSCustomObject]@{
+                            ComputerName = $ComputerName
+                            PowerShell = $PowerShell
+                            AsyncResult = $AsyncResult
+                        })
+                    }
+
+                    while ($Jobs.Count -gt 0) {
+                        foreach ($Job in @($Jobs)) {
+                            if (-not $Job.AsyncResult.IsCompleted) {
+                                continue
+                            }
+
+                            try {
+                                $Result = $Job.PowerShell.EndInvoke($Job.AsyncResult)
+
+                                foreach ($Item in $Result) {
+                                    if ($Item.Reachable) {
+                                        Write-Host "Connection successful: $($Item.ComputerName)" -ForegroundColor Green
+
+                                        [void]$Targets.Add([PSCustomObject]@{
+                                            ComputerName = $Item.ComputerName
+                                            IsRemote = $true
+                                        })
+                                    }
+                                    else {
+                                        Write-Host "Unable to connect: $($Item.ComputerName)" -ForegroundColor Red
+                                    }
+                                }
+                            }
+                            catch {
+                                Write-Host "Unable to test: $($Job.ComputerName)" -ForegroundColor Red
+                            }
+                            finally {
+                                $Job.PowerShell.Dispose()
+                                [void]$Jobs.Remove($Job)
                             }
                         }
-                        else {
-                            Write-Host "Unable to connect to $ComputerName." -ForegroundColor Red
+
+                        if ($Jobs.Count -gt 0) {
+                            Start-Sleep -Milliseconds 100
                         }
                     }
+
+                    $RunspacePool.Close()
+                    $RunspacePool.Dispose()
 
                     $Targets = @($Targets)
 
@@ -164,13 +226,13 @@ function New-PSFieldKitContext {
                     }
 
                     Write-Host "`nReachable targets: $($Targets.Count)" -ForegroundColor Cyan
-                    Start-Sleep -Seconds 1
+                    Read-Host "Press Enter to continue"
 
                     return [PSCustomObject]@{
-                        ComputerName  = $null
-                        IsRemote      = $true
-                        Session       = $null
-                        Targets       = $Targets
+                        ComputerName = $null
+                        IsRemote = $true
+                        Session = $null
+                        Targets = $Targets
                         IsMultiTarget = $true
                     }
                 }
