@@ -64,7 +64,7 @@ function Show-PSFieldKitExchangeDAGMenu {
 
         switch ($Choice) {
             "1" {
-                Show-PSFieldKitExchangeDAGInformation -ExchangeContext $ExchangeContext
+                Show-PSFieldKitExchangeDAGInformationMenu -ExchangeContext $ExchangeContext
             }
 
             "2" {
