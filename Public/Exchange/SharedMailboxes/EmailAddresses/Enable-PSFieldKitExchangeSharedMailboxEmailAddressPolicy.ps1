@@ -95,6 +95,7 @@ function Enable-PSFieldKitExchangeSharedMailboxEmailAddressPolicy {
     if ($Confirmation -cne "ENABLE POLICY") {
         Write-Host ""
         Write-Host "Operation cancelled." -ForegroundColor Yellow
+        Read-Host "`nPress Enter to continue" | Out-Null
         return
     }
 

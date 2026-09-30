@@ -169,6 +169,7 @@ function New-PSFieldKitExchangeSharedMailbox {
 
     try {
         New-Mailbox @MailboxParameters | Out-Null
+        Set-Mailbox -Identity $MailboxParameters["Name"] -MessageCopyForSentAsEnabled $true -ErrorAction Stop | Out-Null
 
         Write-Host ""
         Write-Host "Shared mailbox created successfully." -ForegroundColor Green

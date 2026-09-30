@@ -155,6 +155,7 @@ function Add-PSFieldKitExchangeSharedMailboxEmailAddress {
     if ($Confirmation -cne "ADD ADDRESS") {
         Write-Host ""
         Write-Host "Operation cancelled." -ForegroundColor Yellow
+        Read-Host "`nPress Enter to continue" | Out-Null
         return
     }
 

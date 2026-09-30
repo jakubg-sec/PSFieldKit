@@ -155,6 +155,7 @@ function Remove-PSFieldKitExchangeSharedMailboxSendAs {
     if ($Confirmation -cne "REMOVE SEND AS") {
         Write-Host ""
         Write-Host "Operation cancelled." -ForegroundColor Yellow
+        Read-Host "`nPress Enter to continue" | Out-Null
         return
     }
 

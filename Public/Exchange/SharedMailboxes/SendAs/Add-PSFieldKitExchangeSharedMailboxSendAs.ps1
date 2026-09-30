@@ -151,6 +151,7 @@ function Add-PSFieldKitExchangeSharedMailboxSendAs {
     if ($Confirmation -cne "ADD SEND AS") {
         Write-Host ""
         Write-Host "Operation cancelled." -ForegroundColor Yellow
+        Read-Host "`nPress Enter to continue" | Out-Null
         return
     }
 

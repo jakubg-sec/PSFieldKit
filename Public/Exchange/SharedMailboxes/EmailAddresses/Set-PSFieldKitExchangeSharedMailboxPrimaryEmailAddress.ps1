@@ -214,6 +214,7 @@ function Set-PSFieldKitExchangeSharedMailboxPrimaryEmailAddress {
     if ($Confirmation -cne "SET PRIMARY") {
         Write-Host ""
         Write-Host "Operation cancelled." -ForegroundColor Yellow
+        Read-Host "`nPress Enter to continue" | Out-Null
         return
     }
 

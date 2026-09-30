@@ -155,6 +155,7 @@ function Remove-PSFieldKitExchangeSharedMailboxFullAccess {
     if ($Confirmation -cne "REMOVE FULL ACCESS") {
         Write-Host ""
         Write-Host "Operation cancelled." -ForegroundColor Yellow
+        Read-Host "`nPress Enter to continue" | Out-Null
         return
     }
 

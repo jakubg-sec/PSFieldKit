@@ -169,6 +169,7 @@ function Add-PSFieldKitExchangeSharedMailboxFullAccess {
     if ($Confirmation -cne "ADD FULL ACCESS") {
         Write-Host ""
         Write-Host "Operation cancelled." -ForegroundColor Yellow
+        Read-Host "`nPress Enter to continue" | Out-Null
         return
     }
 
