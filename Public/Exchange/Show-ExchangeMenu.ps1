@@ -1,3 +1,4 @@
+```powershell
 function Show-ExchangeMenu {
     $ExchangeContext = $null
     $ConnectionRequiredOptions = @(
@@ -6,11 +7,6 @@ function Show-ExchangeMenu {
         '5'
         '6'
         '7'
-        '8'
-        '9'
-        '10'
-        '11'
-        '12'
     )
 
     while ($true) {
@@ -74,13 +70,6 @@ function Show-ExchangeMenu {
         Write-Host "|  [5] Shared Mailboxes                        |"
         Write-Host "|  [6] Distribution Groups                     |"
         Write-Host "|  [7] Mailbox Databases                       |"
-        Write-Host "|  [8] Mail Flow                               |"
-        Write-Host "|  [9] DAG & Replication                       |"
-        Write-Host "|                                              |"
-        Write-Host "|  SECURITY & HEALTH                           |" -ForegroundColor DarkCyan
-        Write-Host "| [10] Certificates                            |"
-        Write-Host "| [11] Exchange Health                         |"
-        Write-Host "| [12] Diagnostics                             |"
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"
         Write-Host "|                                              |"
@@ -160,26 +149,6 @@ function Show-ExchangeMenu {
                 Show-PSFieldKitExchangeDatabaseMenu -ExchangeContext $ExchangeContext
             }
 
-            '8' {
-                Show-PSFieldKitExchangeMailFlowMenu -ExchangeContext $ExchangeContext
-            }
-
-            '9' {
-                Show-PSFieldKitExchangeDAGMenu -ExchangeContext $ExchangeContext
-            }
-
-            '10' {
-                Show-PSFieldKitExchangeCertificateMenu -ExchangeContext $ExchangeContext
-            }
-
-            '11' {
-                Show-PSFieldKitExchangeHealthMenu -ExchangeContext $ExchangeContext
-            }
-
-            '12' {
-                Show-PSFieldKitExchangeDiagnosticsMenu -ExchangeContext $ExchangeContext
-            }
-
             '0' {
                 if ($null -ne $ExchangeContext) {
                     Disconnect-PSFieldKitExchangeServer -ExchangeContext $ExchangeContext | Out-Null
@@ -196,3 +165,4 @@ function Show-ExchangeMenu {
         }
     }
 }
+```
