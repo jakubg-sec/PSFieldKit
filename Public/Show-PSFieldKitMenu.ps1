@@ -3,7 +3,7 @@ function Show-PSFieldKitMenu {
         Clear-Host
 
         Write-Host "+------------------------------------------------------+" -ForegroundColor DarkCyan
-        Write-Host "|                  PSFieldKit v1.1.0                   |" -ForegroundColor Cyan
+        Write-Host "|                  PSFieldKit v1.2.0                   |" -ForegroundColor Cyan
         Write-Host "|              PowerShell SysAdmin Toolkit             |" -ForegroundColor Cyan
         Write-Host "|                    Author: jacob                     |" -ForegroundColor DarkGray
         Write-Host "+------------------------------------------------------+" -ForegroundColor DarkCyan

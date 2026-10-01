@@ -1,266 +1,419 @@
 # PSFieldKit
 
-**PSFieldKit** is a PowerShell-based system administration toolkit for Windows administrators. The project provides an interactive console menu for system information, network diagnostics, Active Directory administration and diagnostics, processes and services, event logs, storage, security, remote administration, and Windows software/update inspection.
+**PowerShell SysAdmin Toolkit for Windows**
 
-The project is implemented as a PowerShell script module (`PSFieldKit.psm1`) with a module manifest (`PSFieldKit.psd1`). Its code is divided into `Private` helper functions and a larger `Public` functional area organized by administrative domain.
+PSFieldKit is a PowerShell-based administration, diagnostics and troubleshooting toolkit designed for Windows system administrators.
 
-> **Documentation scope:** this README describes the source tree and code dump supplied with the project. It intentionally does not document functionality that could not be confirmed from the supplied source.
+The project provides a unified interactive console for common Windows administration tasks, Active Directory management and diagnostics, networking, processes and services, Event Logs, storage, security, remote administration, Windows Update, security auditing and on-premises Exchange Server administration.
 
----
+PSFieldKit is implemented as a PowerShell script module and is designed around a simple principle:
 
-## Status
+> **One console. Many administrative tasks. Native PowerShell and Windows tooling.**
 
-The project is currently organized as an interactive administration toolkit rather than a conventional parameter-driven PowerShell command module.
-
----
-
-## Main goals
-
-PSFieldKit is designed to put common Windows administration and troubleshooting tasks behind a single console interface.
-
-The codebase currently contains functionality for:
-
-- Windows computer and hardware information
-- Network configuration and connectivity diagnostics
-- Active Directory administration and diagnostics
-- Domain controller inspection
-- AD replication and trust diagnostics
-- Group Policy inspection and execution
-- DNS administration inside Active Directory tooling
-- Processes and Windows services
-- Windows Event Log inspection, search, clearing, and export
-- Storage, disks, volumes, partitions, and Storage Spaces
-- Local security configuration and security-state inspection
-- BitLocker and Microsoft Defender status
-- Installed software and Windows update information
-- Remote PowerShell, CIM/WMI, command and script execution
-- Remote computer administration through MMC tools
-- RDP session shadowing
-- Remote restart and shutdown
-- Multi-target operation for selected features
+The project is intended primarily for administrators who need a practical field toolkit rather than a collection of unrelated scripts.
 
 ---
 
-## Highlights
+# Features
 
-### Interactive target selection
+PSFieldKit currently provides the following major areas:
 
-Most non-AD areas operate against a target context selected before entering the relevant menu:
+| Area | Description |
+|---|---|
+| Computer Information | System, OS, hardware, CPU, memory, disks, adapters and uptime |
+| Network Diagnostics | Network adapters, IP configuration, routes, ARP/neighbor table, DNS, connectivity, ports, statistics and firewall |
+| Active Directory | Domains, forests, users, computers, groups, OUs, DCs, GPOs, replication, trusts, diagnostics, searches and DNS |
+| Processes & Services | Process inspection, service management and dependencies |
+| Event Logs | Event inspection, search, channel information, clearing and export |
+| Storage & Disks | Disk, partition, volume, health, free space, usage and Storage Spaces |
+| Security | Local accounts, groups, security policy, audit policy, certificates, Defender, BitLocker and logged-on users |
+| Remote Administration | WinRM, PowerShell remoting, commands, scripts, CIM/WMI, MMC tools, session shadowing and remote restart/shutdown |
+| Software & Updates | Installed software, Windows features and Windows Update information |
+| Security Auditing | Authentication, suspicious activity, privileged activity, persistence, PowerShell activity, audit configuration and security reports |
+| Exchange | Exchange Server connectivity, mailbox administration, shared mailboxes, delegation, addresses, mailbox state and Exchange reporting |
 
-- Local computer
-- One remote computer
-- Multiple remote computers for features that explicitly enable multi-target mode
+---
 
-Remote targets are tested with `Test-WSMan` before they are accepted by the target-selection workflow.
+# Main Menu
 
-### Multi-target input methods
+PSFieldKit currently exposes the following main menu:
 
-Where multi-target mode is enabled, targets can be provided as:
+```text
++------------------------------------------------------+
+|                  PSFieldKit v1.2.0                   |
+|              PowerShell SysAdmin Toolkit             |
+|                    Author: jacob                     |
++------------------------------------------------------+
+|                                                      |
+|       "With great power there must also come         |
+|                great responsibility."                |
+|                                                      |
++------------------------------------------------------+
+|                                                      |
+|  SYSTEM                                              |
+|  [1] Computer Information                            |
+|  [2] Network Diagnostics                             |
+|  [3] Active Directory                                |
+|  [4] Processes & Services                            |
+|  [5] Event Logs                                      |
+|                                                      |
+|  ADMINISTRATION                                      |
+|  [6] Storage & Disks                                 |
+|  [7] Security                                        |
+|  [8] Remote Administration                           |
+|  [9] Software & Updates                              |
+| [10] Security Auditing                               |
+| [11] Exchange                                        |
+|                                                      |
++------------------------------------------------------+
+|  [0] Exit                                            |
++------------------------------------------------------+
+```
 
-1. A comma-separated list
-2. An IPv4 range
-3. An IPv4 CIDR network
-4. A text file
+`Show-PSFieldKitMenu` is the main entry point of the toolkit.
 
-The target collector limits range/CIDR/file input to **4096 addresses/entries**.
-
-### Windows-native tooling
-
-The project makes extensive use of native Windows PowerShell cmdlets and Windows executables such as:
-
-- `Get-CimInstance`
-- `New-CimSession`
-- `Invoke-Command`
-- `Get-WinEvent`
-- `wevtutil.exe`
-- `secedit.exe`
-- `qwinsta.exe`
-- `mstsc.exe`
-- `compmgmt.msc`
-- `eventvwr.msc`
-- `services.msc`
-- `taskschd.msc`
-- `diskmgmt.msc`
-- `devmgmt.msc`
-- `fsmgmt.msc`
+The current implementation also contains an internal option `[66]`, which is not part of the normal documented administration workflow.
 
 ---
 
 # Requirements
 
-## Operating system
+## Operating System
 
-PSFieldKit is a **Windows-only** toolkit in its current form.
+PSFieldKit is currently a **Windows-only** toolkit.
 
-This follows directly from the source code: it depends on Windows-specific PowerShell modules, Windows registry paths, certificate stores, Windows Update COM objects, Windows management namespaces, MMC snap-ins, Windows executables, and Active Directory tooling.
+The implementation relies on Windows-specific functionality including:
 
-The repository does **not** declare a formal minimum Windows client or Windows Server version in the module manifest. Exact supported OS releases should therefore be treated as an environment-specific compatibility question rather than as a promise of the current source tree.
+- Windows PowerShell components
+- Windows registry providers
+- CIM/WMI
+- certificate stores
+- Windows Update COM APIs
+- Microsoft management cmdlets
+- MMC consoles
+- Windows executables
+- Active Directory tools
+- Exchange Management Shell components
 
-## PowerShell
+The module manifest does not currently declare a formal minimum Windows client or Windows Server version.
 
-The module manifest does not specify a `PowerShellVersion` value.
+Exact OS compatibility should therefore be validated against the target environment.
 
-The source code does contain explicit compatibility logic for PowerShell versions below and above major version 6. In particular, remote connectivity testing uses the Windows PowerShell-style `Test-Connection -ComputerName` parameter on older PowerShell versions and the newer `-TargetName` form on PowerShell 6+.
+---
 
-Therefore:
+# PowerShell
 
-- PowerShell compatibility is partially accounted for in the code.
-- The project does **not** formally declare a tested minimum/maximum PowerShell version.
-- The most Windows-specific functionality is expected to depend on the Windows PowerShell ecosystem and installed Windows management modules.
+PSFieldKit is designed around the Windows PowerShell ecosystem, while parts of the code contain explicit compatibility handling for different PowerShell generations.
 
-## Required Windows management components
+The module manifest does not currently declare a formal `PowerShellVersion`.
 
-The module manifest has an empty `RequiredModules` list, so dependencies are not automatically installed or enforced by PowerShell module metadata.
+The source contains compatibility handling for older Windows PowerShell and newer PowerShell releases in selected operations.
 
-Depending on the feature being used, the source expects Windows functionality such as:
+Recommended environments should therefore be tested before production deployment.
 
-| Area | Examples of commands/components used |
-|---|---|
-| Active Directory | `Get-ADUser`, `Get-ADComputer`, `Get-ADGroup`, `Get-ADDomain`, `Get-ADForest`, `Get-ADDomainController` |
-| Group Policy | `Get-GPO`, `Get-GPOReport`, `Get-GPInheritance`, `Get-GPResultantSetOfPolicy`, `Invoke-GPUpdate` |
-| DNS Server | `Get-DnsServerZone`, `Get-DnsServerResourceRecord`, `Get-DnsServerForwarder`, `Get-DnsServerStatistics` |
-| Server features | `Get-WindowsFeature` |
-| Windows optional features | `Get-WindowsOptionalFeature` |
-| Storage | `Get-Disk`, `Get-Partition`, `Get-Volume`, `Get-PhysicalDisk`, `Get-StoragePool`, `Get-VirtualDisk` |
-| Networking | `Get-NetRoute`, `Get-NetNeighbor`, `Get-NetTCPConnection`, `Get-NetFirewallProfile`, `Test-NetConnection` |
-| Defender | `Get-MpComputerStatus` |
-| BitLocker | `Get-BitLockerVolume` |
-| CIM/WMI | `Get-CimInstance`, `New-CimSession`, `Invoke-CimMethod` |
-| Event Logs | `Get-WinEvent`, `wevtutil.exe` |
-| Windows Update | `Microsoft.Update.Session`, `Microsoft.Update.AutoUpdate` |
+---
 
-For Active Directory, the menu explicitly attempts to import the **ActiveDirectory** PowerShell module and reports an error when it is not available.
+# Administrative Privileges
 
-On systems without the corresponding RSAT/server-management components, only the unrelated parts of PSFieldKit can be expected to function.
+A significant part of PSFieldKit requires administrative privileges.
+
+Depending on the selected operation, elevated access may be required for:
+
+- Active Directory administration
+- Group Policy operations
+- service management
+- Event Log clearing
+- Event Log export
+- remote administration
+- RDP session shadowing
+- remote restart/shutdown
+- Exchange administration
+- security auditing
+- BitLocker inspection
+- Defender inspection
+- system configuration inspection
+
+PSFieldKit does not attempt to bypass Windows security controls.
+
+It operates using the permissions available to the current operator.
+
+---
+
+# Dependencies
+
+The module manifest does not automatically install feature-specific dependencies.
+
+Depending on the selected menu, the system may require components such as:
+
+### Active Directory
+
+```powershell
+ActiveDirectory
+```
+
+Typically supplied through:
+
+- RSAT
+- Active Directory Domain Services management tools
+- domain administration tooling
+
+### Group Policy
+
+Group Policy management tools.
+
+### DNS Server
+
+DNS Server PowerShell management tools where applicable.
+
+### Storage
+
+Windows Storage Management cmdlets.
+
+### Security
+
+Windows Defender, BitLocker and security-policy tooling.
+
+### Event Logs
+
+Windows Event Log infrastructure and:
+
+```text
+wevtutil.exe
+```
+
+### Windows Update
+
+Windows Update COM APIs.
+
+### Exchange
+
+For the Exchange subsystem, the management computer must have access to the required **on-premises Exchange Server Management Shell / Exchange PowerShell cmdlets**.
+
+The exact Exchange functionality available depends on the Exchange environment and installed management components.
 
 ---
 
 # Installation
 
-## Repository-local installation
+## Repository-local
 
-The simplest way to use the project while developing or testing it is to keep the module directory intact and import the manifest directly.
+Clone or download the repository while preserving the complete directory structure.
+
+Then:
 
 ```powershell
 Set-Location .\PSFieldKit
 Import-Module .\PSFieldKit.psd1 -Force
 ```
 
-Then start the main interface:
+Start the toolkit:
 
 ```powershell
 Show-PSFieldKitMenu
 ```
 
-## Installation into a PowerShell module path
+---
 
-If the `PSFieldKit` directory is placed under a directory listed in `$env:PSModulePath`, it can be imported by module name:
+## PowerShell Module Path
+
+The module can also be copied into a directory included in:
+
+```powershell
+$env:PSModulePath
+```
+
+Then:
 
 ```powershell
 Import-Module PSFieldKit
+Show-PSFieldKitMenu
 ```
-
-The project itself does not contain an installer, package script, PowerShell Gallery publishing configuration, or dependency bootstrapper in the supplied source.
-
-## Recommended import method
-
-Import the **module manifest**:
-
-```powershell
-Import-Module .\PSFieldKit.psd1 -Force
-```
-
-The manifest identifies `PSFieldKit.psm1` as the root module and controls the explicit export surface.
 
 ---
 
-# Starting PSFieldKit
+## Verify Installation
 
-After importing the module:
+Check the module:
+
+```powershell
+Get-Module PSFieldKit
+```
+
+Check the module version:
+
+```powershell
+Get-Module PSFieldKit -ListAvailable
+```
+
+Check exported commands:
+
+```powershell
+Get-Command -Module PSFieldKit
+```
+
+---
+
+# Module Entry Point
+
+The primary user-facing command is:
 
 ```powershell
 Show-PSFieldKitMenu
 ```
 
-The main menu contains:
+The module manifest explicitly controls the exported surface.
 
-```text
-+----------------------------------------------+
-|              PSFieldKit v1.0                 |
-|        PowerShell SysAdmin Toolkit           |
-+----------------------------------------------+
-|                                              |
-|  [1] Computer Information                    |
-|  [2] Network Diagnostics                     |
-|  [3] Active Directory                        |
-|  [4] Processes & Services                    |
-|  [5] Event Logs                              |
-|  [6] Storage & Disks                         |
-|  [7] Security                                |
-|  [8] Remote Administration                   |
-|  [9] Software & Updates                      |
-|                                              |
-|  [0] Exit                                    |
-|                                              |
-+----------------------------------------------+
-```
-
-The main menu creates a target context for most areas. Active Directory is different: the AD menu operates directly through the installed AD-related cmdlets and does not use the common `New-PSFieldKitContext` workflow.
+The project intentionally exposes a single main administration entry point rather than turning every internal function into a public PowerShell command.
 
 ---
 
-# Target model: Local / Remote / Multiple Targets
+# Architecture
 
-## Target context
-
-`New-PSFieldKitContext` returns an internal `PSCustomObject` containing the following fields:
-
-| Property | Meaning |
-|---|---|
-| `ComputerName` | Selected single computer name, or `$null` in multi-target mode |
-| `IsRemote` | Indicates whether the context is remote |
-| `Session` | PSSession slot; initialized as `$null` |
-| `Targets` | Array of target objects with `ComputerName` and `IsRemote` |
-| `IsMultiTarget` | Indicates multi-target context |
-
-The common context is passed to the functional menus and then to the individual functions.
-
-## Local Computer
-
-Select:
+PSFieldKit uses a standard PowerShell script-module architecture.
 
 ```text
-[1] Local Computer
+PSFieldKit/
+│
+├── Private/
+│
+├── Public/
+│
+├── PSFieldKit.psd1
+├── PSFieldKit.psm1
+├── CHANGELOG.md
+├── LICENSE
+└── README.md
 ```
 
-The local host is represented by `$env:COMPUTERNAME` and `IsRemote = $false`.
-
-## Remote Computer
-
-Select:
+The module loader recursively loads `.ps1` files from both:
 
 ```text
-[2] Remote Computer
+Private\
+Public\
 ```
 
-The user enters a computer name or IP address. The target must pass `Test-WSMan` before the context is accepted.
-
-This means that **WinRM availability is part of target selection**, not merely an optional diagnostic later.
-
-## Multiple Computers
-
-Multiple-target mode is enabled only for the main menu areas that explicitly call:
+using:
 
 ```powershell
-New-PSFieldKitContext -AllowMultipleTargets
+Get-ChildItem
 ```
 
-In the current code this is used by:
+and dot-sourcing them into the module scope.
+
+This keeps the implementation modular while maintaining a single module entry point.
+
+---
+
+# Private Functions
+
+The private layer provides shared infrastructure used by the public functionality.
+
+Important helpers include:
+
+```text
+Get-PSFieldKitTargets
+New-PSFieldKitContext
+Test-PSFieldKitMenuOption
+Test-PSFieldKitTarget
+Write-PSFieldKitMenuOption
+```
+
+These functions handle:
+
+- target selection
+- target validation
+- target contexts
+- multi-target processing
+- menu validation
+- menu rendering
+- target-specific option availability
+
+---
+
+# Target Model
+
+One of the central architectural concepts in PSFieldKit is the **target context**.
+
+The context represents the system or systems against which an operation will be executed.
+
+PSFieldKit supports:
+
+```text
+Local Computer
+Remote Computer
+Multiple Remote Computers
+```
+
+Multi-target mode is selectively enabled by the individual menu.
+
+---
+
+# Target Context
+
+`New-PSFieldKitContext` creates the shared target object.
+
+Typical properties include:
+
+| Property | Description |
+|---|---|
+| `ComputerName` | Single selected computer |
+| `IsRemote` | Indicates remote operation |
+| `Session` | PSSession slot |
+| `Targets` | Target collection |
+| `IsMultiTarget` | Indicates multi-target mode |
+
+---
+
+# Local Computer
+
+Local mode uses:
+
+```powershell
+$env:COMPUTERNAME
+```
+
+The resulting context has:
+
+```text
+IsRemote = False
+IsMultiTarget = False
+```
+
+---
+
+# Single Remote Computer
+
+The operator enters:
+
+- hostname
+- computer name
+- IP address
+
+Before the target is accepted, WinRM is tested.
+
+PSFieldKit uses:
+
+```powershell
+Test-WSMan
+```
+
+This makes WinRM availability part of the target-selection process.
+
+A remote computer can therefore be reachable through ICMP and still be rejected when WinRM is unavailable.
+
+---
+
+# Multiple Computers
+
+Multi-target mode is currently enabled for selected functional areas.
+
+The primary areas using it are:
 
 - Event Logs
 - Remote Administration
+- Security Auditing
 
-The multi-target menu provides:
+The target collector supports:
 
 ```text
 [1] Computer List
@@ -269,17 +422,25 @@ The multi-target menu provides:
 [4] Text File
 ```
 
-### Computer list
+---
+
+# Computer List
 
 Example:
 
 ```text
-server01,server02,192.168.10.20
+server01,server02,server03,192.168.10.25
 ```
 
-Blank entries are ignored and duplicate entries are removed.
+Input is normalized by:
 
-### IPv4 range
+- trimming whitespace
+- removing empty entries
+- removing duplicates
+
+---
+
+# IPv4 Range
 
 Example:
 
@@ -287,9 +448,15 @@ Example:
 192.168.10.10-192.168.10.50
 ```
 
-The range must contain valid IPv4 addresses, the start must not be greater than the end, and ranges larger than 4096 addresses are rejected.
+Requirements:
 
-### IPv4 CIDR
+- valid IPv4 addresses
+- start address cannot exceed end address
+- maximum range size: 4096 addresses
+
+---
+
+# IPv4 CIDR
 
 Example:
 
@@ -297,36 +464,46 @@ Example:
 192.168.10.0/24
 ```
 
-Only IPv4 CIDR notation is accepted. Prefix lengths from `/1` through `/32` are supported, but networks producing more than 4096 addresses are rejected.
+Supported prefix lengths:
 
-The implementation expands the complete address block from the calculated network address. It does not explicitly remove network/broadcast addresses.
+```text
+/1 - /32
+```
 
-### Text file
+Networks generating more than 4096 addresses are rejected.
 
-Example file:
+The implementation expands the calculated address block and does not explicitly remove network or broadcast addresses.
+
+---
+
+# Target File
+
+Example:
 
 ```text
 server01
 server02
-192.168.10.20
+server03
+192.168.10.25
+
 # comments are allowed
 ```
 
 The loader:
 
-- trims each line,
-- ignores empty lines,
-- ignores lines beginning with `#`,
-- removes duplicates,
-- limits the file to 4096 entries.
+- trims lines
+- ignores empty lines
+- ignores lines beginning with `#`
+- removes duplicates
+- limits input to 4096 entries
 
-The entries are then tested for reachability with `Test-WSMan` by the normal target-selection flow.
+The resulting targets are validated through the normal WinRM validation process.
 
 ---
 
-# Main functional areas
+# 1. Computer Information
 
-## 1. Computer Information
+The Computer Information subsystem provides basic system inventory.
 
 Menu:
 
@@ -341,35 +518,38 @@ Menu:
 [8] Uptime
 ```
 
-The functions use CIM/WMI data and can work against the selected local or single remote context.
+Functions include:
 
-### Functions
+```text
+Show-ComputerMenu
+Get-SystemInformation
+Get-OperatingSystemInformation
+Get-HardwareInformation
+Get-CPUInformation
+Get-MemoryInformation
+Get-DiskInformation
+Get-NetworkAdapterInformation
+Get-Uptime
+```
 
-- `Get-SystemInformation`
-- `Get-OperatingSystemInformation`
-- `Get-HardwareInformation`
-- `Get-CPUInformation`
-- `Get-MemoryInformation`
-- `Get-DiskInformation`
-- `Get-NetworkAdapterInformation`
-- `Get-Uptime`
-- `Show-ComputerMenu`
+Information includes:
 
-### Typical information collected
+- operating system
+- computer name
+- manufacturer
+- model
+- CPU information
+- processor counts
+- memory
+- disks
+- network adapters
+- uptime
 
-The implementation includes data such as:
-
-- operating system properties,
-- computer/system information,
-- processor information and processor counts,
-- memory data,
-- physical/logical disk information,
-- network adapters,
-- uptime calculations.
+The subsystem uses Windows CIM/WMI functionality.
 
 ---
 
-## 2. Network Diagnostics
+# 2. Network Diagnostics
 
 Menu:
 
@@ -385,25 +565,26 @@ Menu:
 [9] Firewall Information
 ```
 
-### Confirmed functions present in the supplied dump
+Functions include:
 
-- `Get-NetworkAdapters`
-- `Get-NetworkNeighborTable`
-- `Get-RoutingTable`
-- `Test-NetworkConnectivity`
-- `Get-NetworkStatistics`
-- `Get-PortsAndConnections`
-- `Get-FirewallInformation`
-- `Show-NetworkMenu`
+```text
+Show-NetworkMenu
+Get-NetworkAdapters
+Get-NetworkIPConfiguration
+Get-RoutingTable
+Get-NetworkNeighborTable
+Test-DNSDiagnostics
+Test-NetworkConnectivity
+Get-PortsAndConnections
+Get-NetworkStatistics
+Get-FirewallInformation
+```
 
-### Additional functions
+---
 
-- `Get-NetworkIPConfiguration`
-- `Test-DNSDiagnostics`
+## Connectivity
 
-### Connectivity tests
-
-`Test-NetworkConnectivity` provides an interactive submenu for a single selected target:
+`Test-NetworkConnectivity` provides:
 
 ```text
 [1] Ping
@@ -411,23 +592,37 @@ Menu:
 [3] Traceroute
 ```
 
-The TCP test accepts ports `1..65535` and uses `Test-NetConnection`.
+TCP tests support:
+
+```text
+1-65535
+```
+
+and use:
+
+```powershell
+Test-NetConnection
+```
 
 ---
 
-## 3. Active Directory
+# 3. Active Directory
 
-The Active Directory area is the largest subsystem in the project.
+Active Directory is one of the largest subsystems in PSFieldKit.
 
-The main menu attempts to load:
+The AD menu loads:
 
 ```powershell
-Import-Module ActiveDirectory -ErrorAction Stop
+Import-Module ActiveDirectory
 ```
 
-If that fails, the menu reports that the Active Directory PowerShell module is not installed and tells the operator to install RSAT / Active Directory tools.
+when the subsystem is entered.
 
-### AD main menu
+If the Active Directory PowerShell module is unavailable, PSFieldKit reports the dependency problem instead of silently failing.
+
+---
+
+## AD Main Menu
 
 ```text
 [1] Domain & Forest Information
@@ -444,30 +639,35 @@ If that fails, the menu reports that the Active Directory PowerShell module is n
 [12] DNS
 ```
 
-### 3.1 Domain & Forest Information
+---
 
-Menu:
+## 3.1 Domain & Forest
+
+The subsystem provides:
 
 ```text
-[1] Domain Information
-[2] Forest Information
-[3] FSMO Roles
-[4] Domain Functional Level
-[5] Forest Functional Level
-[6] Sites & Subnets
+Domain Information
+Forest Information
+FSMO Roles
+Domain Functional Level
+Forest Functional Level
+Sites & Subnets
 ```
 
-Functions:
+Functions include:
 
-- `Get-ADDomainInformation`
-- `Get-ADForestInformation`
-- `Get-ADFSMORoles`
-- `Get-ADDomainFunctionalLevel`
-- `Get-ADForestFunctionalLevel`
-- `Get-ADSiteInformation`
-- `Show-ADDomainForestMenu`
+```text
+Get-ADDomainInformation
+Get-ADForestInformation
+Get-ADFSMORoles
+Get-ADDomainFunctionalLevel
+Get-ADForestFunctionalLevel
+Get-ADSiteInformation
+```
 
-### 3.2 User Management
+---
+
+## 3.2 User Management
 
 Menu:
 
@@ -483,51 +683,55 @@ Menu:
 [9] Group Membership
 ```
 
-Functions:
+Functions include:
 
-- `Get-ADUserInformation`
-- `Search-ADUsers`
-- `New-ADUserAccount`
-- `Disable-ADUserAccount`
-- `Enable-ADUserAccount`
-- `Unlock-ADUserAccount`
-- `Reset-ADUserPassword`
-- `Remove-ADUserAccount`
-- `Show-ADUserGroupMembership`
-- `Show-ADUserMenu`
+```text
+Get-ADUserInformation
+Search-ADUsers
+New-ADUserAccount
+Disable-ADUserAccount
+Enable-ADUserAccount
+Unlock-ADUserAccount
+Reset-ADUserPassword
+Remove-ADUserAccount
+Show-ADUserGroupMembership
+```
 
-Account-changing operations are interactive and include confirmation prompts. User creation and password reset also prompt for temporary password data.
+Administrative operations require appropriate permissions.
 
-### 3.3 Computer Management
+---
+
+## 3.3 Computer Management
 
 Menu:
 
 ```text
 [1] Computer Information
 [2] Search Computers
-[3] Create Computer Account
+[3] Create Computer
 [4] Enable Computer
 [5] Disable Computer
-[6] Reset Computer Account
+[6] Reset Computer
 [7] Remove Computer
-[8] Last Logon Information
+[8] Last Logon
 ```
 
-Functions:
+Functions include:
 
-- `Get-ADComputerInformation`
-- `Search-ADComputers`
-- `New-ADComputerAccount`
-- `Enable-ADComputerAccount`
-- `Disable-ADComputerAccount`
-- `Reset-ADComputerAccount`
-- `Remove-ADComputerAccount`
-- `Get-ADComputerLastLogon`
-- `Show-ADComputerMenu`
+```text
+Get-ADComputerInformation
+Search-ADComputers
+New-ADComputerAccount
+Enable-ADComputerAccount
+Disable-ADComputerAccount
+Reset-ADComputerAccount
+Remove-ADComputerAccount
+Get-ADComputerLastLogon
+```
 
-Create/enable/disable/reset actions use confirmation prompts; removal requires explicit `DELETE` confirmation.
+---
 
-### 3.4 Group Management
+## 3.4 Group Management
 
 Menu:
 
@@ -543,22 +747,19 @@ Menu:
 [9] Nested Group Membership
 ```
 
-Functions:
+The group functionality covers:
 
-- `Get-ADGroupInformation`
-- `Search-ADGroups`
-- `New-ADGroupAccount`
-- `Remove-ADGroupAccount`
-- `Add-ADGroupMemberAccount`
-- `Remove-ADGroupMemberAccount`
-- `Get-ADGroupMembers`
-- `Get-ADUserGroupMembership`
-- `Get-ADNestedGroupMembership`
-- `Show-ADGroupMenu`
+- group information
+- group searches
+- group creation
+- group removal
+- membership management
+- nested membership
+- user membership inspection
 
-Group creation supports Global, DomainLocal, and Universal scope plus Security/Distribution type selection.
+---
 
-### 3.5 Organizational Units
+## 3.5 Organizational Units
 
 Menu:
 
@@ -571,114 +772,110 @@ Menu:
 [6] Remove OU
 ```
 
-Functions:
-
-- `Get-ADOUTree`
-- `Get-ADOUInformation`
-- `Search-ADOUs`
-- `New-PSFKADOrganizationalUnit`
-- `Rename-PSFKADOrganizationalUnit`
-- `Remove-PSFKADOrganizationalUnit`
-- `Show-ADOrganizationalUnitMenu`
-
-OU deletion requires explicit `DELETE` confirmation.
-
-### 3.6 Domain Controllers
-
-Menu:
+OU operations include:
 
 ```text
-[1] Domain Controller Information
-[2] List Domain Controllers
-[3] Services
-[4] SYSVOL / NETLOGON
-[5] Connectivity
-[6] Event Logs
-[7] DC Diagnostics
+Get-ADOUTree
+Get-ADOUInformation
+Search-ADOUs
+New-PSFKADOrganizationalUnit
+Rename-PSFKADOrganizationalUnit
+Remove-PSFKADOrganizationalUnit
 ```
 
-Functions:
+---
 
-- `Get-ADDomainControllerInformation`
-- `Get-ADDomainControllers`
-- `Get-ADDomainControllerServices`
-- `Test-ADDomainControllerSYSVOL`
-- `Test-ADDomainControllerConnectivity`
-- `Get-ADDomainControllerEventLogs`
-- `Test-ADDomainControllerDiagnostics`
-- `Show-ADDomainControllerMenu`
+## 3.6 Domain Controllers
 
-The DC connectivity test checks:
-
-- DNS resolution
-- ICMP reachability
-- TCP 53 (DNS)
-- TCP 88 (Kerberos)
-- TCP 135 (RPC)
-- TCP 389 (LDAP)
-- TCP 445 (SMB)
-- TCP 3268 (Global Catalog)
-- TCP 5985 (WinRM)
-
-### 3.7 Group Policy
-
-Menu:
+The DC subsystem provides:
 
 ```text
-[1] GPO Information
-[2] Search GPOs
-[3] GPO Links
-[4] GPO Permissions
-[5] Generate GPReport
-[6] Force GPUpdate
-[7] Group Policy Results
-[8] Group Policy Modeling
-[9] GPO Diagnostics
+Domain Controller Information
+List Domain Controllers
+Services
+SYSVOL / NETLOGON
+Connectivity
+Event Logs
+DC Diagnostics
 ```
 
-Functions:
-
-- `Get-ADGPOInformation`
-- `Search-ADGPOs`
-- `Get-ADGPOLinks`
-- `Get-ADGPOPermissions`
-- `Get-ADGPReport`
-- `Invoke-ADGPUpdate`
-- `Get-ADGroupPolicyResults`
-- `Get-ADGroupPolicyModeling`
-- `Test-ADGPODiagnostics`
-- `Show-ADGPOMenu`
-
-Report generation supports HTML and XML output choices in the interactive workflow.
-
-### 3.8 Replication
-
-Menu:
+Connectivity checks include commonly required AD ports such as:
 
 ```text
-[1] Replication Status
-[2] Replication Partners
-[3] Replication Failures
-[4] Replication Metadata
-[5] Synchronize Replication
-[6] Replication Summary
-[7] Repadmin Diagnostics
+53    DNS
+88    Kerberos
+135   RPC
+389   LDAP
+445   SMB
+3268  Global Catalog
+5985  WinRM
 ```
 
-Functions:
+---
 
-- `Get-ADReplicationStatus`
-- `Get-ADReplicationPartners`
-- `Get-ADReplicationFailures`
-- `Get-ADReplicationMetadata`
-- `Sync-ADReplication`
-- `Get-ADReplicationSummary`
-- `Test-ADReplicationDiagnostics`
-- `Show-ADReplicationMenu`
+## 3.7 Group Policy
 
-The replication functions use Active Directory replication metadata/failure/partner cmdlets and `Sync-ADObject` where object-specific synchronization is requested.
+The Group Policy area provides:
 
-### 3.9 Trusts
+```text
+GPO Information
+Search GPOs
+GPO Links
+GPO Permissions
+Generate GPReport
+Force GPUpdate
+Group Policy Results
+Group Policy Modeling
+GPO Diagnostics
+```
+
+Functions include:
+
+```text
+Get-ADGPOInformation
+Search-ADGPOs
+Get-ADGPOLinks
+Get-ADGPOPermissions
+Get-ADGPReport
+Invoke-ADGPUpdate
+Get-ADGroupPolicyResults
+Get-ADGroupPolicyModeling
+Test-ADGPODiagnostics
+```
+
+GPO reporting supports generated policy reports.
+
+---
+
+## 3.8 Replication
+
+The replication subsystem provides:
+
+```text
+Replication Status
+Replication Partners
+Replication Failures
+Replication Metadata
+Synchronize Replication
+Replication Summary
+Repadmin Diagnostics
+```
+
+Functions include:
+
+```text
+Get-ADReplicationStatus
+Get-ADReplicationPartners
+Get-ADReplicationFailures
+Get-ADReplicationMetadata
+Sync-ADReplication
+Get-ADReplicationSummary
+Test-ADReplicationDiagnostics
+```
+
+---
+
+## 3.9 Trusts
 
 Menu:
 
@@ -690,16 +887,11 @@ Menu:
 [5] Trust Diagnostics
 ```
 
-Functions:
+The subsystem covers both domain and forest trust information and diagnostics.
 
-- `Get-ADTrustInformation`
-- `Get-ADDomainTrusts`
-- `Test-ADTrust`
-- `Get-ADForestTrustInformation`
-- `Test-ADTrustDiagnostics`
-- `Show-ADTrustMenu`
+---
 
-### 3.10 AD Diagnostics
+## 3.10 AD Diagnostics
 
 Menu:
 
@@ -713,18 +905,20 @@ Menu:
 [7] SYSVOL / NETLOGON
 ```
 
-Functions:
+The diagnostics area is intended for first-line investigation of:
 
-- `Get-ADHealthSummary`
-- `Test-ADDCDIAG`
-- `Test-ADDNSDiagnostics`
-- `Test-ADLDAPConnectivity`
-- `Test-ADKerberos`
-- `Test-ADTimeSynchronization`
-- `Test-ADSYSVOLNetlogon`
-- `Show-ADDiagnosticsMenu`
+- DC health
+- DNS
+- LDAP
+- Kerberos
+- time synchronization
+- SYSVOL
+- NETLOGON
+- general domain-controller health
 
-### 3.11 AD Search
+---
+
+## 3.11 Active Directory Search
 
 Menu:
 
@@ -733,42 +927,37 @@ Menu:
 [2] Search by LDAP Filter
 ```
 
-Functions:
-
-- `Search-ADObjects`
-- `Search-ADLDAPFilter`
-- `Show-ADSearchMenu`
-
-### 3.12 AD DNS
-
-Menu:
-
-```text
-[1] DNS Server Information
-[2] DNS Zones
-[3] Zone Information
-[4] DNS Records
-[5] DNS Forwarders
-[6] DNS Scavenging
-[7] DNS Server Statistics
-```
-
-Functions:
-
-- `Get-ADDnsServerInformation`
-- `Get-ADDnsZones`
-- `Get-ADDnsZoneInformation`
-- `Get-ADDnsRecords`
-- `Get-ADDnsForwarders`
-- `Get-ADDnsScavenging`
-- `Get-ADDnsServerStatistics`
-- `Show-ADDnsMenu`
-
-The implementation uses DNS Server PowerShell cmdlets such as `Get-DnsServerZone`, `Get-DnsServerResourceRecord`, `Get-DnsServerForwarder`, `Get-DnsServerScavenging`, and `Get-DnsServerStatistics`.
+The search area supports general object searches and custom LDAP filters.
 
 ---
 
-## 4. Processes & Services
+## 3.12 DNS
+
+The AD DNS subsystem provides:
+
+```text
+DNS Server Information
+DNS Zones
+Zone Information
+DNS Records
+DNS Forwarders
+DNS Scavenging
+DNS Server Statistics
+```
+
+Typical underlying cmdlets include:
+
+```powershell
+Get-DnsServerZone
+Get-DnsServerResourceRecord
+Get-DnsServerForwarder
+Get-DnsServerScavenging
+Get-DnsServerStatistics
+```
+
+---
+
+# 4. Processes & Services
 
 Menu:
 
@@ -784,26 +973,25 @@ Menu:
 [9] Service Dependencies
 ```
 
-Functions:
+Functions include:
 
-- `Get-ProcessInformation`
-- `Get-RunningProcesses`
-- `Get-ProcessDetails`
-- `Get-ServiceInformation`
-- `Get-RunningServices`
-- `Start-PSFieldKitService`
-- `Stop-PSFieldKitService`
-- `Restart-PSFieldKitService`
-- `Get-ServiceDependencies`
-- `Show-ProcessServiceMenu`
+```text
+Get-ProcessInformation
+Get-RunningProcesses
+Get-ProcessDetails
+Get-ServiceInformation
+Get-RunningServices
+Start-PSFieldKitService
+Stop-PSFieldKitService
+Restart-PSFieldKitService
+Get-ServiceDependencies
+```
 
-The process/service implementation uses CIM sessions and CIM methods, allowing the same menu to operate on the selected local or single remote target.
-
-Service-changing actions call CIM methods and therefore require appropriate rights on the target system.
+The implementation uses CIM sessions and methods, allowing the same workflow to operate against local and supported remote targets.
 
 ---
 
-## 5. Event Logs
+# 5. Event Logs
 
 Menu:
 
@@ -819,96 +1007,75 @@ Menu:
 [9] Export Event Logs
 ```
 
-This is one of the areas that enables multi-target mode.
-
-### Functions
-
-- `Get-SystemEventLog`
-- `Get-ApplicationEventLog`
-- `Get-SecurityEventLog`
-- `Get-PowerShellEventLog`
-- `Get-WindowsEventChannels`
-- `Search-PSFieldKitEventLog`
-- `Get-EventLogInformation`
-- `Clear-PSFieldKitEventLog`
-- `Export-EventLogs`
-- `Show-EventLogMenu`
-
-### Event search
-
-`Search-PSFieldKitEventLog` supports filters for:
-
-- event log name,
-- Event ID,
-- level (`Critical`, `Error`, `Warning`, `Information`, `Verbose`, or `All`),
-- provider name,
-- message text,
-- start time,
-- end time,
-- maximum events per target.
-
-The default maximum is **100 events per target**.
-
-### Clear Event Log
-
-`Clear-PSFieldKitEventLog`:
-
-- defaults to the `System` log,
-- supports local and multiple remote targets,
-- uses `wevtutil.exe`,
-- requires the operator to type `CLEAR` before proceeding.
-
-This is a destructive operation and permanently removes the selected event log contents.
-
-### Event log export
-
-`Export-EventLogs` is significantly more extensive than the simple event viewers.
-
-Defaults:
-
-| Setting | Default |
-|---|---|
-| Logs | `System,Application,Security` |
-| Time range | 30 days |
-| Timeout per log | 600 seconds |
-| Overwrite | No |
-| Create ZIP | No |
-| Destination | `C:\PSFieldKit\EventLogs` |
-
-The export workflow creates a timestamped run directory and records metadata including:
-
-- run ID,
-- operator,
-- export host,
-- UTC timestamps,
-- requested logs,
-- time range,
-- target count,
-- result status,
-- exported event count when available,
-- file size,
-- SHA-256 hash,
-- destination path,
-- errors.
-
-It also writes:
-
-- `ExportReport.csv`
-- `ExportManifest.json`
-
-Optional ZIP creation is supported. The export directory can optionally be deleted after the ZIP is successfully created.
-
-For remote exports the implementation uses a path under the remote administrative share:
+Functions include:
 
 ```text
-\\<computer>\c$\Windows\Temp\...
+Get-SystemEventLog
+Get-ApplicationEventLog
+Get-SecurityEventLog
+Get-PowerShellEventLog
+Get-WindowsEventChannels
+Search-PSFieldKitEventLog
+Get-EventLogInformation
+Clear-PSFieldKitEventLog
+Export-EventLogs
 ```
-
-and invokes `wevtutil.exe` remotely through the export workflow. Administrative access to the remote system is therefore required for that workflow.
 
 ---
 
-## 6. Storage & Disks
+## Event Log Export
+
+`Export-EventLogs` provides a structured collection workflow.
+
+Default values include:
+
+| Setting | Default |
+|---|---|
+| Logs | System, Application, Security |
+| Time range | 30 days |
+| Timeout | 600 seconds per log |
+| Overwrite | No |
+| ZIP | No |
+| Destination | `C:\PSFieldKit\EventLogs` |
+
+Exports may include:
+
+- run ID
+- operator
+- source host
+- UTC timestamps
+- selected logs
+- time range
+- target count
+- status
+- event count
+- file size
+- SHA-256 hash
+- destination
+- error information
+
+Generated metadata can include:
+
+```text
+ExportReport.csv
+ExportManifest.json
+```
+
+Optional ZIP creation is supported.
+
+---
+
+## Clear Event Log
+
+`Clear-PSFieldKitEventLog` is destructive.
+
+The operator must explicitly confirm the action.
+
+The function uses Windows Event Log tooling and is intended for authorized administrative use only.
+
+---
+
+# 6. Storage & Disks
 
 Menu:
 
@@ -924,34 +1091,37 @@ Menu:
 [9] Rescan Disks
 ```
 
-Functions:
+Functions include:
 
-- `Get-DiskInformation`
-- `Get-PartitionInformation`
-- `Get-VolumeInformation`
-- `Get-FreeSpace`
-- `Get-DiskHealth`
-- `Get-MountedDrives`
-- `Get-DiskUsage`
-- `Get-StorageSpaces`
-- `Update-PSFieldKitDisk`
-- `Show-StorageMenu`
+```text
+Get-DiskInformation
+Get-PartitionInformation
+Get-VolumeInformation
+Get-FreeSpace
+Get-DiskHealth
+Get-MountedDrives
+Get-DiskUsage
+Get-StorageSpaces
+Update-PSFieldKitDisk
+```
 
-The code uses storage cmdlets such as:
+The storage subsystem uses Windows storage cmdlets such as:
 
-- `Get-Disk`
-- `Get-Partition`
-- `Get-Volume`
-- `Get-PhysicalDisk`
-- `Get-StoragePool`
-- `Get-VirtualDisk`
-- `Update-Disk`
+```powershell
+Get-Disk
+Get-Partition
+Get-Volume
+Get-PhysicalDisk
+Get-StoragePool
+Get-VirtualDisk
+Update-Disk
+```
 
-`Update-PSFieldKitDisk` performs a disk rescan operation and is therefore not purely informational.
+`Update-PSFieldKitDisk` performs an actual disk rescan.
 
 ---
 
-## 7. Security
+# 7. Security
 
 Menu:
 
@@ -966,44 +1136,63 @@ Menu:
 [8] Logged-on Users
 ```
 
-Functions:
-
-- `Get-LocalAccounts`
-- `Get-LocalGroups`
-- `Get-SecurityPolicy`
-- `Get-AuditPolicy`
-- `Get-Certificates`
-- `Get-DefenderStatus`
-- `Get-BitLockerStatus`
-- `Get-LoggedOnUsers`
-- `Show-SecurityMenu`
-
-### Security Policy
-
-`Get-SecurityPolicy` exports the local security policy with `secedit.exe`, parses the resulting configuration, and presents selected settings such as:
-
-- minimum password length,
-- maximum password age,
-- minimum password age,
-- password history size,
-- password complexity,
-- lockout threshold,
-- lockout duration,
-- lockout reset counter,
-- administrator account state,
-- guest account state.
-
-### Certificates
-
-`Get-Certificates` reads from:
+Functions include:
 
 ```text
-Cert:\LocalMachine\<store>
+Get-LocalAccounts
+Get-LocalGroups
+Get-SecurityPolicy
+Get-AuditPolicy
+Get-Certificates
+Get-DefenderStatus
+Get-BitLockerStatus
+Get-LoggedOnUsers
 ```
 
-The default store input is `My`. Optional subject filtering is supported.
+---
 
-Reported fields include:
+## Local Accounts
+
+Displays local account information.
+
+---
+
+## Local Groups
+
+Displays local groups and membership information.
+
+---
+
+## Security Policy
+
+Security policy inspection uses Windows security tooling such as:
+
+```text
+secedit.exe
+```
+
+Information can include:
+
+- password policy
+- lockout policy
+- password complexity
+- administrator state
+- guest account state
+- account policy settings
+
+---
+
+## Audit Policy
+
+The subsystem inspects configured Windows audit policies.
+
+---
+
+## Certificates
+
+Certificate inspection supports the local computer certificate store.
+
+Typical information includes:
 
 - Subject
 - Issuer
@@ -1012,19 +1201,37 @@ Reported fields include:
 - private-key presence
 - friendly name
 
-### Defender
+---
 
-`Get-DefenderStatus` uses `Get-MpComputerStatus`.
+## Microsoft Defender
 
-### BitLocker
+Uses Windows Defender management interfaces such as:
 
-`Get-BitLockerStatus` uses `Get-BitLockerVolume`.
+```powershell
+Get-MpComputerStatus
+```
 
 ---
 
-## 8. Remote Administration
+## BitLocker
 
-Remote Administration is the most operationally sensitive part of the toolkit and explicitly supports multi-target mode.
+Uses:
+
+```powershell
+Get-BitLockerVolume
+```
+
+to inspect BitLocker state.
+
+---
+
+## Logged-on Users
+
+Displays currently logged-on users and session information where supported by the target system.
+
+---
+
+# 8. Remote Administration
 
 Menu:
 
@@ -1042,55 +1249,48 @@ Menu:
 [11] Remote Reboot / Shutdown
 ```
 
-The menu enables actions according to the selected target mode.
+---
 
-### Availability by target mode
+## Target Availability
 
-| Function | Local | Single Remote | Multiple Remote |
-|---|:---:|:---:|:---:|
-| Test Remote Connectivity | No | Yes | Yes |
-| Test WinRM | No | Yes | Yes |
-| Enter Remote PowerShell | No | Yes | No |
-| Remove PSSession | No | Yes | No |
-| Session Information | No | Yes | No |
-| Invoke Remote Command | No | Yes | Yes |
-| Invoke Remote Script | No | Yes | Yes |
-| CIM / WMI Remote Query | No | Yes | Yes |
-| Remote Computer Management | No | Yes | No |
-| RDP Session Shadowing | No | Yes | No |
-| Remote Reboot / Shutdown | No | Yes | Yes |
+| Operation | Local | Single Remote | Multiple Remote |
+|---|---:|---:|---:|
+| Test Remote Connectivity | — | ✓ | ✓ |
+| Test WinRM | — | ✓ | ✓ |
+| Enter Remote PowerShell | — | ✓ | — |
+| Remove PSSession | — | ✓ | — |
+| Session Information | — | ✓ | — |
+| Invoke Remote Command | — | ✓ | ✓ |
+| Invoke Remote Script | — | ✓ | ✓ |
+| CIM/WMI Query | — | ✓ | ✓ |
+| Remote Computer Management | — | ✓ | — |
+| RDP Session Shadowing | — | ✓ | — |
+| Remote Restart/Shutdown | — | ✓ | ✓ |
 
-### Remote connectivity
+---
 
-`Test-PSFieldKitConnection` performs two ICMP requests and calculates the average response time.
+## Remote PowerShell
 
-### WinRM test
+Supports interactive PSSession-based administration against a single remote computer.
 
-`Test-PSFieldKitWinRM` uses `Test-WSMan` and reports:
+---
 
-- protocol version,
-- product vendor,
-- product version,
-- availability/errors.
+## Remote Command
 
-### Remote command execution
+`Invoke-PSFieldKitCommand` allows the operator to provide a PowerShell command that is executed against the selected target or targets.
 
-`Invoke-PSFieldKitCommand` prompts for a PowerShell command, converts it to a script block, and invokes it on every target in the context.
-
-Example input:
+Example:
 
 ```powershell
-Get-CimInstance Win32_OperatingSystem | Select-Object Caption, Version, LastBootUpTime
+Get-CimInstance Win32_OperatingSystem |
+    Select-Object Caption, Version, LastBootUpTime
 ```
 
-### Remote script execution
+---
 
-`Invoke-PSFieldKitScript`:
+## Remote Script
 
-- validates that the local file exists,
-- requires the `.ps1` extension,
-- resolves the path,
-- invokes the script with `Invoke-Command -FilePath` against each target.
+`Invoke-PSFieldKitScript` validates a local `.ps1` file and executes it remotely.
 
 Example:
 
@@ -1098,17 +1298,25 @@ Example:
 C:\Tools\Check-Server.ps1
 ```
 
-### CIM / WMI remote query
+---
 
-`Invoke-PSFieldKitCimQuery` prompts for:
+## CIM/WMI
 
-- CIM namespace (default: `root/cimv2`),
-- class name,
-- optional WQL filter.
+The CIM workflow accepts:
 
-It creates a CIM session per target and executes `Get-CimInstance`.
+```text
+Namespace
+Class
+WQL Filter
+```
 
-Example inputs:
+Default namespace:
+
+```text
+root/cimv2
+```
+
+Example:
 
 ```text
 Namespace: root/cimv2
@@ -1116,49 +1324,54 @@ Class: Win32_OperatingSystem
 Filter: Version -like "10.*"
 ```
 
-### Remote Computer Management
+---
 
-`Show-RemoteComputerManagement` launches Windows management consoles against the selected remote host:
+## Remote Computer Management
 
-- Computer Management
-- Event Viewer
-- Services
-- Task Scheduler
-- Disk Management
-- Device Manager
-- Shared Folders
+PSFieldKit can launch native Windows management consoles for a remote system, including:
 
-It uses local MMC executables with the remote computer name.
+```text
+Computer Management
+Event Viewer
+Services
+Task Scheduler
+Disk Management
+Device Manager
+Shared Folders
+```
 
-### RDP Session Shadowing
+---
 
-`Invoke-PSFieldKitSessionShadowing`:
+## RDP Session Shadowing
 
-1. runs `qwinsta.exe /server:<host>`,
-2. identifies active user sessions,
-3. prompts for a session ID,
-4. supports either:
-   - view-only mode,
-   - control mode.
+The session-shadowing workflow:
 
-Control mode explicitly requires typing `YES` before starting `mstsc.exe /shadow` with `/control`.
+1. enumerates remote sessions
+2. displays session IDs
+3. asks the operator to select a session
+4. supports view-only mode
+5. supports control mode
 
-### Remote reboot and shutdown
+Control mode requires an explicit confirmation before starting a controlled shadowing session.
 
-`Restart-PSFieldKitComputer` supports:
+---
+
+## Remote Restart / Shutdown
+
+The remote power operation supports:
 
 ```text
 [1] Restart computer
 [2] Shutdown computer
 ```
 
-Before the action is executed the operator must type `YES`.
+The operator must explicitly confirm the action.
 
-The function can iterate over multiple remote targets.
+Multiple remote targets can be processed where the menu allows it.
 
 ---
 
-## 9. Software & Updates
+# 9. Software & Updates
 
 Menu:
 
@@ -1174,22 +1387,27 @@ Menu:
 [9] Pending Reboot Status
 ```
 
-Functions:
+Functions include:
 
-- `Get-InstalledSoftware`
-- `Get-SoftwareDetails`
-- `Get-WindowsFeatureInformation`
-- `Get-WindowsUpdateStatus`
-- `Get-AvailableUpdates`
-- `Get-InstalledUpdates`
-- `Get-UpdateHistory`
-- `Find-WindowsUpdates`
-- `Get-PendingRebootStatus`
-- `Show-SoftwareMenu`
+```text
+Get-InstalledSoftware
+Get-SoftwareDetails
+Get-WindowsFeatureInformation
+Get-WindowsUpdateStatus
+Get-AvailableUpdates
+Get-InstalledUpdates
+Get-UpdateHistory
+Find-WindowsUpdates
+Get-PendingRebootStatus
+```
 
-### Installed software
+---
 
-`Get-InstalledSoftware` reads Windows uninstall registry locations including:
+## Installed Software
+
+The implementation reads standard Windows uninstall registry locations.
+
+Typical locations include:
 
 ```text
 HKLM:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*
@@ -1197,574 +1415,880 @@ HKLM:\Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall\*
 HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\*
 ```
 
-### Windows features
+---
 
-`Get-WindowsFeatureInformation` checks whether `Get-WindowsFeature` is available and also uses `Get-WindowsOptionalFeature` where applicable.
+## Windows Features
 
-### Windows Update
+The subsystem supports Windows Server and Windows optional feature inspection using Windows feature-management cmdlets where available.
 
-The update subsystem uses the Windows Update COM API through:
+---
 
-```text
-Microsoft.Update.Session
-Microsoft.Update.AutoUpdate
-```
+## Windows Update
+
+The Windows Update subsystem uses the Windows Update COM API.
 
 It provides:
 
-- Windows Update service status
+- update service status
 - available updates
 - installed updates
 - update history
-- pending reboot status
-- initiating Windows Update detection
+- update detection
+- pending reboot information
 
-`Find-WindowsUpdates` starts an update detection cycle rather than installing updates.
+The update search function detects available updates but is not an automatic update-installation engine.
 
 ---
 
-# Module architecture
+# 10. Security Auditing
 
-The project uses a script-module architecture.
+Security Auditing is dedicated to security-focused investigation rather than basic configuration inspection.
 
-## `PSFieldKit.psm1`
-
-The root module script loads every `.ps1` under `Private` and every `.ps1` under `Public` recursively.
-
-The loading order is:
-
-```powershell
-Private -> alphabetical sort -> dot-source
-Public  -> alphabetical sort -> dot-source
-```
-
-The files are therefore loaded into the module scope rather than being separately imported as nested modules.
-
-## `PSFieldKit.psd1`
-
-The manifest:
-
-- identifies `PSFieldKit.psm1` as `RootModule`,
-- reports module version `0.1.0`,
-- sets author to `jacob`,
-- describes the module as a PowerShell toolkit for system administrators,
-- declares no `RequiredModules`,
-- declares only `Show-PSFieldKitMenu` under `FunctionsToExport`.
-
-Private metadata also contains tags such as:
+Menu entry:
 
 ```text
-PowerShell
-SysAdmin
-Windows
-Administration
-Networking
+[10] Security Auditing
 ```
 
-The manifest does not define a license URI, project URI, icon URI, release notes URL, or explicit PowerShell version requirement.
+The subsystem supports local, single-remote and multi-target workflows.
 
 ---
 
-# Exported command surface
+## Security Audit Areas
 
-The manifest explicitly exports only:
+The current Security Auditing functionality covers:
 
-```powershell
-Show-PSFieldKitMenu
-```
-
-This is important: the `Public` directory contains many functions, but directory placement alone does not make them exported module commands.
-
-For the intended user workflow, PSFieldKit is therefore primarily a **menu-driven tool** with `Show-PSFieldKitMenu` as its public entry point.
-
-Verify the export surface with:
-
-```powershell
-Get-Command -Module PSFieldKit
+```text
+Security Audit Overview
+Suspicious Activity Analysis
+Authentication Auditing
+Privileged Account Activity
+Persistence / Autoruns
+PowerShell Activity
+Audit Policy and Logging
+Security Reports
+Archived Event Logs
 ```
 
 ---
 
-# Examples
+## Audit Scope
 
-## Start the toolkit
+Security Auditing supports:
 
-```powershell
-Import-Module .\PSFieldKit.psd1 -Force
-Show-PSFieldKitMenu
+- local computers
+- single remote computers
+- multiple remote targets
+
+Where multiple targets are enabled, a common analysis window can be applied across the selected systems.
+
+---
+
+## Analysis Time Range
+
+Security analysis can use a configurable time range.
+
+This allows the administrator to focus the investigation on a specific period instead of processing the complete available event history.
+
+---
+
+## Authentication Auditing
+
+Authentication analysis focuses on Windows security events relevant to:
+
+- successful logons
+- failed logons
+- account usage
+- remote access
+- authentication-related anomalies
+
+The purpose is investigation and visibility, not automatic incident-response remediation.
+
+---
+
+## Privileged Activity
+
+The audit subsystem examines activity associated with privileged accounts and security-sensitive operations.
+
+---
+
+## Suspicious Activity
+
+The suspicious-activity workflow aggregates events that can be useful during first-line investigation.
+
+The results should be treated as an investigation aid rather than an automated determination that a security incident has occurred.
+
+---
+
+## Persistence / Autoruns
+
+The persistence audit inspects commonly relevant persistence mechanisms and autorun locations.
+
+---
+
+## PowerShell Activity
+
+The audit subsystem analyzes relevant PowerShell event information where logging is available.
+
+The quality of the analysis depends on the audit configuration of the target system.
+
+---
+
+## Audit Policy and Logging
+
+Security auditing also checks whether the system has appropriate security logging and audit-policy configuration for the events being investigated.
+
+---
+
+## Archived Event Logs
+
+Archived `.evtx` files can be included in security analysis.
+
+This is useful when the relevant events are no longer present in active log channels.
+
+---
+
+## Security Reports
+
+The auditing subsystem can generate security-focused reports intended for:
+
+- investigation
+- administrative review
+- documentation
+- troubleshooting
+- incident triage
+
+---
+
+# 11. Exchange
+
+PSFieldKit includes an **Exchange Server** administration area focused on on-premises Exchange environments.
+
+Main menu entry:
+
+```text
+[11] Exchange
 ```
 
-## Check the exported command
+The Exchange subsystem is designed to work with the Exchange Management Shell and appropriate Exchange PowerShell cmdlets.
 
-```powershell
-Get-Command -Module PSFieldKit
+---
+
+# Exchange Management
+
+The Exchange area provides workflows for:
+
+```text
+Exchange Connection / Status
+Mailbox Management
+Shared Mailboxes
+Mailbox Permissions
+Email Addresses
+Mailbox State
+Retention / Hold Information
+Disconnected Mailboxes
+Exchange Reporting
 ```
 
-## Remote administration workflow
+Exchange functionality is intentionally separated from the standard Active Directory menu because Exchange objects combine directory, recipient and messaging-layer data.
 
-1. Run `Show-PSFieldKitMenu`.
-2. Select `8` for **Remote Administration**.
-3. Select `2` for **Remote Computer** or `3` for **Multiple Computers**.
-4. Enter the target.
-5. The toolkit tests WinRM with `Test-WSMan`.
-6. Use the appropriate remote administration operation.
+---
 
-## Multiple target event-log workflow
+## Exchange Connection
 
-1. Start `Show-PSFieldKitMenu`.
-2. Select `5` for **Event Logs**.
-3. Select `3` for **Multiple Computers**.
-4. Choose one of:
-   - Computer List
-   - IPv4 Range
-   - IPv4 CIDR
-   - Text File
-5. Allow PSFieldKit to test the targets.
-6. Select Event Log Search, Clear, or Export as required.
+The Exchange menu manages its own Exchange context.
 
-## Multi-target command execution
+Operations requiring an Exchange session are prevented from running until the required Exchange environment is available.
 
-1. Open **Remote Administration**.
-2. Select **Multiple Computers**.
-3. Choose **Invoke Remote Command**.
-4. Enter a PowerShell command.
-5. The command is sent to each reachable target.
+This avoids executing Exchange commands in an ordinary PowerShell session where the relevant Exchange cmdlets are not loaded.
 
-Example command:
+---
 
-```powershell
-Get-Service WinRM | Select-Object Name, Status, StartType
+## Mailbox Overview
+
+The mailbox workflows provide administrative views including:
+
+- users with Exchange mailboxes
+- disabled AD users with mailboxes
+- inactive users with mailboxes
+- users potentially eligible for AD account lifecycle actions while still having mailboxes
+- disconnected mailboxes
+
+These views are particularly useful for identifying accounts whose AD and Exchange lifecycle state no longer match.
+
+---
+
+## Disabled Users with Mailboxes
+
+This report is useful for finding:
+
+```text
+AD account disabled
+        +
+Exchange mailbox still present
+```
+
+Such accounts can then be reviewed before further lifecycle action.
+
+---
+
+## Inactive Users with Mailboxes
+
+The Exchange area can identify users whose AD/account activity indicates inactivity while a mailbox remains provisioned.
+
+This is intended as an administrative investigation/reporting feature.
+
+---
+
+## Mailboxes Relevant to Account Lifecycle
+
+PSFieldKit can identify users whose directory state may make them candidates for administrative cleanup or review while an Exchange mailbox still exists.
+
+The toolkit does not silently delete such mailboxes.
+
+The purpose is to make potentially conflicting AD/Exchange state visible to the administrator.
+
+---
+
+## Disconnected Mailboxes
+
+Disconnected mailbox information can be inspected as part of Exchange mailbox administration.
+
+This is useful when investigating:
+
+- removed mailboxes
+- retention
+- mailbox database state
+- disconnected recipient objects
+
+---
+
+# Shared Mailboxes
+
+The Exchange subsystem includes shared-mailbox administration.
+
+Typical tasks include:
+
+```text
+List shared mailboxes
+Inspect shared mailbox properties
+Manage mailbox access
+Manage Send As
+Manage Send on Behalf
+Review mailbox addresses
+```
+
+Shared mailboxes are treated separately from ordinary user mailboxes.
+
+---
+
+# Mailbox Permissions
+
+PSFieldKit provides mailbox delegation administration around common Exchange permissions.
+
+The workflows cover concepts such as:
+
+```text
+Full Access
+Send As
+Send on Behalf
+```
+
+Permission changes are administrative operations and require the appropriate Exchange permissions.
+
+---
+
+## Full Access
+
+Full Access delegation allows the selected user to access the target mailbox according to the Exchange mailbox-permission model.
+
+---
+
+## Send As
+
+Send As delegation allows a delegated user to send messages as the target mailbox.
+
+---
+
+## Send on Behalf
+
+Send on Behalf delegation allows a delegated user to send messages on behalf of the mailbox.
+
+---
+
+# Email Addresses
+
+The Exchange subsystem also supports inspection and management of mailbox/recipient email-address information.
+
+This is useful for:
+
+- reviewing aliases
+- checking primary SMTP addresses
+- validating recipient addresses
+- auditing address configuration
+
+---
+
+# Mailbox Retention
+
+PSFieldKit can inspect Exchange retention-related configuration.
+
+This includes mailbox-level retention and organization-related retention information where exposed by the available Exchange cmdlets.
+
+The menu provides visibility into retention configuration rather than assuming a single retention policy applies to every mailbox.
+
+---
+
+# Mailbox Holds
+
+Mailbox hold and retention information can be inspected to help determine whether a mailbox is subject to preservation or retention-related controls.
+
+This is particularly important before performing administrative mailbox lifecycle actions.
+
+---
+
+# Exchange Reporting
+
+The Exchange subsystem supports report generation for administrative review.
+
+Exchange reports are intended to make mailbox and recipient state easier to review without manually querying every object.
+
+Typical report subjects include:
+
+- users with mailboxes
+- disabled users with mailboxes
+- inactive mailboxes
+- mailbox state
+- mailbox retention
+- mailbox permissions
+- shared mailbox configuration
+- recipient email addresses
+
+---
+
+# Exchange and Active Directory
+
+PSFieldKit treats Active Directory and Exchange as related but separate management layers.
+
+A user can therefore exist in AD while also having:
+
+- a mailbox
+- mailbox permissions
+- recipient addresses
+- retention settings
+- mailbox holds
+
+This is why the Exchange subsystem contains dedicated reporting and verification workflows.
+
+The toolkit does not assume that disabling or removing an AD object automatically resolves all Exchange-side state.
+
+---
+
+# Remote Operations
+
+Remote functionality is based on Windows administration technologies including:
+
+```text
+WinRM
+PowerShell Remoting
+CIM/WMI
+MMC
+Windows command-line utilities
+Exchange Management Shell
+```
+
+Availability depends on:
+
+- network connectivity
+- DNS
+- authentication
+- firewall configuration
+- WinRM
+- administrative permissions
+- Exchange management components where Exchange functionality is used
+
+---
+
+# Destructive and High-Impact Operations
+
+PSFieldKit is not a read-only diagnostic application.
+
+It contains operations capable of changing system state.
+
+Examples include:
+
+```text
+Disable-ADUserAccount
+Enable-ADUserAccount
+Remove-ADUserAccount
+Reset-ADUserPassword
+
+New-ADComputerAccount
+Disable-ADComputerAccount
+Enable-ADComputerAccount
+Remove-ADComputerAccount
+Reset-ADComputerAccount
+
+New-ADGroupAccount
+Remove-ADGroupAccount
+Add-ADGroupMemberAccount
+Remove-ADGroupMemberAccount
+
+Remove-PSFKADOrganizationalUnit
+Rename-PSFKADOrganizationalUnit
+
+Sync-ADReplication
+
+Start-PSFieldKitService
+Stop-PSFieldKitService
+Restart-PSFieldKitService
+
+Clear-PSFieldKitEventLog
+
+Restart-PSFieldKitComputer
+
+Invoke-PSFieldKitCommand
+Invoke-PSFieldKitScript
+```
+
+Exchange functionality can also modify mailbox permissions and recipient configuration.
+
+Such operations should be executed only by authorized administrators.
+
+---
+
+# Confirmation Safeguards
+
+High-impact operations use explicit confirmation where applicable.
+
+Examples include confirmation phrases such as:
+
+```text
+YES
+```
+
+or:
+
+```text
+CLEAR
+```
+
+or other context-specific confirmation prompts.
+
+These checks are deliberate safeguards against accidental changes.
+
+---
+
+# Security Considerations
+
+## Remote Execution
+
+The following functionality can execute PowerShell code remotely:
+
+```text
+Invoke-PSFieldKitCommand
+Invoke-PSFieldKitScript
+```
+
+These should be considered privileged administrative capabilities.
+
+---
+
+## Event Logs
+
+Exported `.evtx` files may contain:
+
+- usernames
+- authentication events
+- security events
+- system information
+- application activity
+- operational data
+
+Event Log exports should therefore be treated as sensitive administrative/security data.
+
+---
+
+## Credentials
+
+PSFieldKit does not implement a dedicated credential vault.
+
+Remote operations use the existing Windows/PowerShell authentication mechanisms and the permissions available to the operator.
+
+---
+
+## Exchange Data
+
+Exchange reports may contain:
+
+- mailbox identities
+- primary SMTP addresses
+- aliases
+- delegation information
+- recipient configuration
+- retention state
+
+Such reports should be handled as potentially sensitive administrative data.
+
+---
+
+# Known Limitations
+
+## Interactive-first design
+
+PSFieldKit is primarily menu-driven and uses interactive input heavily.
+
+It is not currently designed as a traditional collection of fully parameterized cmdlets for automation pipelines.
+
+---
+
+## Selective multi-target support
+
+Multi-target processing is not universally implemented across every subsystem.
+
+The main menu currently enables it for:
+
+- Event Logs
+- Remote Administration
+- Security Auditing
+
+---
+
+## WinRM dependency
+
+Remote target selection requires successful WinRM validation.
+
+---
+
+## IPv4 target expansion
+
+Range and CIDR expansion currently focuses on IPv4.
+
+---
+
+## Target limits
+
+Multi-target expansion is limited to a maximum of 4096 addresses/entries for supported input methods.
+
+---
+
+## Exchange environment dependency
+
+Exchange functionality depends on the Exchange environment and the availability of the appropriate Exchange Management Shell components/cmdlets.
+
+---
+
+## Active Directory dependency
+
+The AD subsystem requires the Active Directory PowerShell tooling.
+
+---
+
+## Version metadata
+
+The repository should keep the following synchronized for each release:
+
+```text
+PSFieldKit.psd1
+Main menu version banner
+README release/version information
+CHANGELOG.md
 ```
 
 ---
 
-# Permissions and administrative rights
+# Project Structure
 
-PSFieldKit does not implement privilege escalation. Operations execute under the current PowerShell security context and therefore depend on the operator's existing permissions.
-
-Expect elevated or delegated rights to be required for operations such as:
-
-- creating/removing/enabling/disabling/resetting AD accounts,
-- changing AD group membership,
-- creating/removing/renaming OUs,
-- Group Policy operations,
-- replication synchronization,
-- manipulating Windows services,
-- restarting or shutting down remote computers,
-- clearing event logs,
-- remote event-log export through administrative shares,
-- remote RDP session shadowing,
-- accessing protected security/certificate information.
-
-The exact required permissions depend on the target OS, domain configuration, delegated AD rights, WinRM configuration, firewall policy, Remote Desktop policy, and the particular operation being performed.
-
----
-
-# Security considerations
-
-PSFieldKit performs real administrative actions. Treat it as an administration tool, not as a read-only diagnostic viewer.
-
-## High-impact operations
-
-The following code paths can change or destroy system/domain state:
-
-- `New-ADUserAccount`
-- `Remove-ADUserAccount`
-- `Disable-ADUserAccount`
-- `Enable-ADUserAccount`
-- `Unlock-ADUserAccount`
-- `Reset-ADUserPassword`
-- `New-ADComputerAccount`
-- `Remove-ADComputerAccount`
-- `Disable-ADComputerAccount`
-- `Enable-ADComputerAccount`
-- `Reset-ADComputerAccount`
-- `New-ADGroupAccount`
-- `Remove-ADGroupAccount`
-- `Add-ADGroupMemberAccount`
-- `Remove-ADGroupMemberAccount`
-- `New-PSFKADOrganizationalUnit`
-- `Rename-PSFKADOrganizationalUnit`
-- `Remove-PSFKADOrganizationalUnit`
-- `Sync-ADReplication`
-- `Start-PSFieldKitService`
-- `Stop-PSFieldKitService`
-- `Restart-PSFieldKitService`
-- `Clear-PSFieldKitEventLog`
-- `Update-PSFieldKitDisk`
-- `Invoke-PSFieldKitCommand`
-- `Invoke-PSFieldKitScript`
-- `Restart-PSFieldKitComputer`
-
-Particularly sensitive are the generic remote execution functions because the operator supplies arbitrary PowerShell code or a PowerShell script path.
-
-## Remote execution
-
-`Invoke-PSFieldKitCommand` and `Invoke-PSFieldKitScript` intentionally provide a mechanism to execute code on remote targets. Anyone with sufficient access to the module's runtime environment should be treated as an operator with significant administrative capability.
-
-## Event logs
-
-`Clear-PSFieldKitEventLog` permanently clears the selected event log after explicit confirmation.
-
-`Export-EventLogs` writes `.evtx` files and supporting metadata to disk. These files may contain sensitive security, authentication, user, system, and application information.
-
-## Credentials and secrets
-
-The source does not contain a built-in credential vault or credential-management system. Remote operations rely on the current PowerShell/Windows security context and the underlying Windows remoting mechanisms.
-
----
-
-# Known limitations
-
-The following limitations are directly visible in the supplied implementation:
-
-1. **Interactive console workflow** — the project is primarily operated through `Read-Host`-driven menus rather than a conventional set of parameter-rich exported PowerShell commands.
-2. **Remote target selection requires WinRM** — `New-PSFieldKitContext` uses `Test-WSMan` to validate remote targets before the context is accepted.
-3. **Multi-target mode is selective** — only Event Logs and Remote Administration enable `-AllowMultipleTargets` from the main menu.
-4. **Multi-target address/input limit** — range/CIDR/file target input is capped at 4096 addresses/entries.
-5. **IPv4-only expansion** — range and CIDR target generation supports IPv4 only.
-6. **CIDR expansion includes the full block** — network/broadcast addresses are not explicitly excluded.
-7. **No automatic session object creation in the common context** — `Context.Session` starts as `$null`.
-8. **The project does not declare formal PowerShell/Windows version requirements in the manifest.**
-9. **Dependencies are not declared through `RequiredModules`.**
-10. **Only `Show-PSFieldKitMenu` is exported by the manifest.**
-
----
-
-
-# Project structure
-
-The supplied project tree is organized as follows:
+The project is organized around individual administrative domains.
 
 ```text
 PSFieldKit/
+│
 ├── Private/
 │   ├── Get-PSFieldKitTargets.ps1
 │   ├── New-PSFieldKitContext.ps1
 │   ├── Test-PSFieldKitMenuOption.ps1
 │   ├── Test-PSFieldKitTarget.ps1
 │   └── Write-PSFieldKitMenuOption.ps1
+│
+├── Public/
+│   ├── ActiveDirectory/
+│   │   ├── ComputerManagement/
+│   │   ├── Diagnostics/
+│   │   ├── DNS/
+│   │   ├── DomainControllers/
+│   │   ├── DomainForest/
+│   │   ├── GroupManagement/
+│   │   ├── GroupPolicy/
+│   │   ├── OrganizationalUnits/
+│   │   ├── Replication/
+│   │   ├── Search/
+│   │   ├── Trusts/
+│   │   └── UserManagement/
+│   │
+│   ├── ComputerInformation/
+│   ├── EventLogs/
+│   ├── NetworkDiagnostics/
+│   ├── ProcessesServices/
+│   ├── RemoteAdministration/
+│   ├── Security/
+│   ├── SoftwareUpdates/
+│   ├── SecurityAuditing/
+│   ├── Exchange/
+│   └── Show-PSFieldKitMenu.ps1
+│
 ├── PSFieldKit.psd1
 ├── PSFieldKit.psm1
-└── Public/
-    ├── ActiveDirectory/
-    │   ├── ComputerManagement/
-    │   ├── Diagnostics/
-    │   ├── DNS/
-    │   ├── DomainControllers/
-    │   ├── DomainForest/
-    │   ├── GroupManagement/
-    │   ├── GroupPolicy/
-    │   ├── OrganizationalUnits/
-    │   ├── Replication/
-    │   ├── Search/
-    │   ├── Trusts/
-    │   └── UserManagement/
-    ├── ComputerInformation/
-    ├── EventLogs/
-    ├── NetworkDiagnostics/
-    ├── ProcessesServices/
-    ├── RemoteAdministration/
-    ├── Security/
-    ├── SoftwareUpdates/
-    ├── StorageDisks/
-    └── Show-PSFieldKitMenu.ps1
+├── CHANGELOG.md
+├── LICENSE
+└── README.md
 ```
 
-The supplied project tree reports **24 directories and 183 files**.
+The exact subdirectory layout may continue to evolve as the Exchange and Security Auditing areas are expanded.
 
 ---
 
-# Function inventory
+# Development Model
 
-The following inventory preserves the function names present in the supplied source.
+The project deliberately uses small, focused `.ps1` files.
 
-## Private functions
+Each function generally has a single administrative responsibility.
 
-- `Get-PSFieldKitTargets`
-- `New-PSFieldKitContext`
-- `Test-PSFieldKitMenuOption`
-- `Test-PSFieldKitTarget`
-- `Write-PSFieldKitMenuOption`
+This makes it easier to:
 
-## Public: ComputerInformation
-
-- `Show-ComputerMenu`
-- `Get-SystemInformation`
-- `Get-OperatingSystemInformation`
-- `Get-HardwareInformation`
-- `Get-CPUInformation`
-- `Get-MemoryInformation`
-- `Get-DiskInformation`
-- `Get-NetworkAdapterInformation`
-- `Get-Uptime`
-
-## Public: NetworkDiagnostics
-
-- `Show-NetworkMenu`
-- `Get-NetworkAdapters`
-- `Get-NetworkIPConfiguration`
-- `Get-RoutingTable`
-- `Get-NetworkNeighborTable`
-- `Test-DNSDiagnostics`
-- `Test-NetworkConnectivity`
-- `Get-PortsAndConnections`
-- `Get-NetworkStatistics`
-- `Get-FirewallInformation`
-
-## Public: ActiveDirectory / ComputerManagement
-
-- `Show-ADComputerMenu`
-- `Get-ADComputerInformation`
-- `Search-ADComputers`
-- `New-ADComputerAccount`
-- `Enable-ADComputerAccount`
-- `Disable-ADComputerAccount`
-- `Reset-ADComputerAccount`
-- `Remove-ADComputerAccount`
-- `Get-ADComputerLastLogon`
-
-## Public: ActiveDirectory / Diagnostics
-
-- `Show-ADDiagnosticsMenu`
-- `Get-ADHealthSummary`
-- `Test-ADDCDIAG`
-- `Test-ADDNSDiagnostics`
-- `Test-ADLDAPConnectivity`
-- `Test-ADKerberos`
-- `Test-ADTimeSynchronization`
-- `Test-ADSYSVOLNetlogon`
-
-## Public: ActiveDirectory / DNS
-
-- `Show-ADDnsMenu`
-- `Get-ADDnsServerInformation`
-- `Get-ADDnsZones`
-- `Get-ADDnsZoneInformation`
-- `Get-ADDnsRecords`
-- `Get-ADDnsForwarders`
-- `Get-ADDnsScavenging`
-- `Get-ADDnsServerStatistics`
-
-## Public: ActiveDirectory / DomainControllers
-
-- `Show-ADDomainControllerMenu`
-- `Get-ADDomainControllerInformation`
-- `Get-ADDomainControllers`
-- `Get-ADDomainControllerServices`
-- `Test-ADDomainControllerSYSVOL`
-- `Test-ADDomainControllerConnectivity`
-- `Get-ADDomainControllerEventLogs`
-- `Test-ADDomainControllerDiagnostics`
-
-## Public: ActiveDirectory / DomainForest
-
-- `Show-ADDomainForestMenu`
-- `Get-ADDomainInformation`
-- `Get-ADForestInformation`
-- `Get-ADFSMORoles`
-- `Get-ADDomainFunctionalLevel`
-- `Get-ADForestFunctionalLevel`
-- `Get-ADSiteInformation`
-
-## Public: ActiveDirectory / GroupManagement
-
-- `Show-ADGroupMenu`
-- `Get-ADGroupInformation`
-- `Search-ADGroups`
-- `New-ADGroupAccount`
-- `Remove-ADGroupAccount`
-- `Add-ADGroupMemberAccount`
-- `Remove-ADGroupMemberAccount`
-- `Get-ADGroupMembers`
-- `Get-ADUserGroupMembership`
-- `Get-ADNestedGroupMembership`
-
-## Public: ActiveDirectory / GroupPolicy
-
-- `Show-ADGPOMenu`
-- `Get-ADGPOInformation`
-- `Search-ADGPOs`
-- `Get-ADGPOLinks`
-- `Get-ADGPOPermissions`
-- `Get-ADGPReport`
-- `Invoke-ADGPUpdate`
-- `Get-ADGroupPolicyResults`
-- `Get-ADGroupPolicyModeling`
-- `Test-ADGPODiagnostics`
-
-## Public: ActiveDirectory / OrganizationalUnits
-
-- `Show-ADOrganizationalUnitMenu`
-- `Get-ADOUTree`
-- `Get-ADOUInformation`
-- `Search-ADOUs`
-- `New-PSFKADOrganizationalUnit`
-- `Rename-PSFKADOrganizationalUnit`
-- `Remove-PSFKADOrganizationalUnit`
-
-## Public: ActiveDirectory / Replication
-
-- `Show-ADReplicationMenu`
-- `Get-ADReplicationStatus`
-- `Get-ADReplicationPartners`
-- `Get-ADReplicationFailures`
-- `Get-ADReplicationMetadata`
-- `Sync-ADReplication`
-- `Get-ADReplicationSummary`
-- `Test-ADReplicationDiagnostics`
-
-## Public: ActiveDirectory / Search
-
-- `Show-ADSearchMenu`
-- `Search-ADObjects`
-- `Search-ADLDAPFilter`
-
-## Public: ActiveDirectory / Trusts
-
-- `Show-ADTrustMenu`
-- `Get-ADTrustInformation`
-- `Get-ADDomainTrusts`
-- `Test-ADTrust`
-- `Get-ADForestTrustInformation`
-- `Test-ADTrustDiagnostics`
-
-## Public: ActiveDirectory / UserManagement
-
-- `Show-ADUserMenu`
-- `Get-ADUserInformation`
-- `Search-ADUsers`
-- `New-ADUserAccount`
-- `Disable-ADUserAccount`
-- `Enable-ADUserAccount`
-- `Unlock-ADUserAccount`
-- `Reset-ADUserPassword`
-- `Remove-ADUserAccount`
-- `Show-ADUserGroupMembership`
-
-## Public: EventLogs
-
-- `Show-EventLogMenu`
-- `Get-SystemEventLog`
-- `Get-ApplicationEventLog`
-- `Get-SecurityEventLog`
-- `Get-PowerShellEventLog`
-- `Get-WindowsEventChannels`
-- `Search-PSFieldKitEventLog`
-- `Get-EventLogInformation`
-- `Clear-PSFieldKitEventLog`
-- `Export-EventLogs`
-
-## Public: ProcessesServices
-
-- `Show-ProcessServiceMenu`
-- `Get-ProcessInformation`
-- `Get-RunningProcesses`
-- `Get-ProcessDetails`
-- `Get-ServiceInformation`
-- `Get-RunningServices`
-- `Start-PSFieldKitService`
-- `Stop-PSFieldKitService`
-- `Restart-PSFieldKitService`
-- `Get-ServiceDependencies`
-
-## Public: RemoteAdministration
-
-- `Show-RemoteAdministrationMenu`
-- `Test-PSFieldKitConnection`
-- `Test-PSFieldKitWinRM`
-- `Enter-PSFieldKitRemotePowerShell`
-- `Remove-PSFieldKitSession`
-- `Get-PSFieldKitSession`
-- `Invoke-PSFieldKitCommand`
-- `Invoke-PSFieldKitScript`
-- `Invoke-PSFieldKitCimQuery`
-- `Show-RemoteComputerManagement`
-- `Invoke-PSFieldKitSessionShadowing`
-- `Restart-PSFieldKitComputer`
-
-## Public: Security
-
-- `Show-SecurityMenu`
-- `Get-LocalAccounts`
-- `Get-LocalGroups`
-- `Get-SecurityPolicy`
-- `Get-AuditPolicy`
-- `Get-Certificates`
-- `Get-DefenderStatus`
-- `Get-BitLockerStatus`
-- `Get-LoggedOnUsers`
-
-## Public: SoftwareUpdates
-
-- `Show-SoftwareMenu`
-- `Get-InstalledSoftware`
-- `Get-SoftwareDetails`
-- `Get-WindowsFeatureInformation`
-- `Get-WindowsUpdateStatus`
-- `Get-AvailableUpdates`
-- `Get-InstalledUpdates`
-- `Get-UpdateHistory`
-- `Find-WindowsUpdates`
-- `Get-PendingRebootStatus`
-
-## Public: StorageDisks
-
-- `Show-StorageMenu`
-- `Get-DiskInformation`
-- `Get-PartitionInformation`
-- `Get-VolumeInformation`
-- `Get-FreeSpace`
-- `Get-DiskHealth`
-- `Get-MountedDrives`
-- `Get-DiskUsage`
-- `Get-StorageSpaces`
-- `Update-PSFieldKitDisk`
+- troubleshoot the code
+- extend a menu
+- test a function independently
+- find a feature quickly
+- maintain the project without creating a monolithic script
 
 ---
 
-# Development notes
+# Public and Private Separation
 
-The current source tree is intentionally organized around small, single-purpose `.ps1` files. Functions are loaded centrally by `PSFieldKit.psm1` rather than through separate submodules.
+The `Private` layer is responsible for shared infrastructure.
 
-The private helper layer centralizes:
+The `Public` layer contains functional areas.
 
-- target/context creation,
-- multi-target parsing,
-- WinRM target validation,
-- target-mode menu availability checks,
-- menu rendering.
+The public source tree does not automatically mean every function is exported as a module command.
 
-The public layer is arranged by administrative domain and each domain generally contains both:
+The main user entry point remains:
 
-- a `Show-*Menu` function,
-- one or more operational functions.
+```powershell
+Show-PSFieldKitMenu
+```
 
-This makes the source tree relatively easy to navigate by task area even though only the main menu is exported to consumers of the manifest.
+---
+
+# Native Windows Tooling
+
+PSFieldKit intentionally uses the tools that Windows administrators already know.
+
+Examples include:
+
+```text
+Get-CimInstance
+New-CimSession
+Invoke-Command
+Get-WinEvent
+wevtutil.exe
+secedit.exe
+qwinsta.exe
+mstsc.exe
+compmgmt.msc
+eventvwr.msc
+services.msc
+taskschd.msc
+diskmgmt.msc
+devmgmt.msc
+fsmgmt.msc
+```
+
+This keeps the toolkit close to the underlying Windows administration model rather than introducing a large custom abstraction layer.
+
+---
+
+# Examples
+
+## Start PSFieldKit
+
+```powershell
+Import-Module .\PSFieldKit.psd1 -Force
+Show-PSFieldKitMenu
+```
+
+---
+
+## Check the installed module
+
+```powershell
+Get-Module PSFieldKit -ListAvailable
+```
+
+---
+
+## Inspect exported commands
+
+```powershell
+Get-Command -Module PSFieldKit
+```
+
+---
+
+## Typical Remote Administration Workflow
+
+```text
+1. Start PSFieldKit
+2. Select Remote Administration
+3. Select target mode
+4. Enter the target(s)
+5. Allow PSFieldKit to validate WinRM
+6. Select the required remote operation
+```
+
+---
+
+## Typical Security Audit Workflow
+
+```text
+1. Start PSFieldKit
+2. Select Security Auditing
+3. Select local, single-remote or multi-target mode
+4. Select the analysis period
+5. Select the audit category
+6. Review the generated findings/report
+```
+
+---
+
+## Typical Exchange Workflow
+
+```text
+1. Start PSFieldKit
+2. Select Exchange
+3. Establish/validate the Exchange context
+4. Select the required Exchange management area
+5. Review the current recipient/mailbox state
+6. Perform the required administrative action
+7. Verify the resulting Exchange state
+8. Export a report when required
+```
+
+---
+
+# Versioning
+
+PSFieldKit follows Semantic Versioning:
+
+```text
+MAJOR.MINOR.PATCH
+```
+
+### MAJOR
+
+Breaking or major architectural changes.
+
+### MINOR
+
+New backward-compatible functionality.
+
+### PATCH
+
+Backward-compatible bug fixes.
+
+Example:
+
+```text
+1.1.0 -> 1.2.0
+New functionality
+
+1.2.0 -> 1.2.1
+Bug fixes
+
+1.2.0 -> 2.0.0
+Breaking changes
+```
+
+---
+
+# Contributing
+
+When adding functionality:
+
+- keep shared infrastructure in `Private`
+- organize functionality under the appropriate `Public` area
+- keep individual functions focused
+- reuse the existing target/context model
+- validate input
+- provide useful error messages
+- use confirmation for destructive operations
+- document new functionality
+- update `CHANGELOG.md`
+- keep version information synchronized
+
+New administration areas should ideally include:
+
+```text
+Show-*Menu
+Operational functions
+Target handling
+Validation
+Error handling
+Documentation
+Changelog entry
+```
 
 ---
 
 # License
 
-PSFieldKit is licensed under the [MIT License](LICENSE).
+PSFieldKit is licensed under the MIT License.
 
 Copyright (c) 2026 jacob.
 
-See the [LICENSE](LICENSE) file for the full license text.
+See [`LICENSE`](LICENSE) for the complete license text.
 
 ---
 
 # Summary
 
-PSFieldKit is a console-oriented Windows administration toolkit built as a PowerShell script module. Its architecture is centered around a common target context for local and remote system operations, with dedicated functional areas for Active Directory, networking, processes/services, event logs, storage, security, software/updates, and remote administration.
+PSFieldKit is a PowerShell-based Windows administration toolkit centered around a single interactive entry point:
 
-The strongest architectural characteristics visible in the current code are:
+```powershell
+Show-PSFieldKitMenu
+```
 
-- one main interactive entry point: `Show-PSFieldKitMenu`,
-- recursive dot-sourcing through `PSFieldKit.psm1`,
-- target-aware functions built around `PSCustomObject` context objects,
-- selective multi-target support,
-- extensive use of Windows-native administration interfaces,
-- a large Active Directory subsystem,
-- destructive operations guarded by explicit interactive confirmations in many places.
+The current project combines:
 
+```text
+Computer Information
+Network Diagnostics
+Active Directory
+Processes & Services
+Event Logs
+Storage & Disks
+Security
+Remote Administration
+Software & Updates
+Security Auditing
+Exchange
+```
+
+The architecture is intentionally PowerShell-native and modular.
+
+It combines:
+
+```text
+Target Context
+Local / Remote / Multi-Target Workflows
+Windows Native Administration
+Active Directory Management
+Security Investigation
+Event Log Collection
+Remote Administration
+Exchange Server Administration
+```
+
+The toolkit is intended to be practical in day-to-day Windows infrastructure administration: diagnostics when something is broken, inspection when something looks suspicious, and administrative actions when a system actually needs changing.
+
+> **With great power there must also come great responsibility.**
