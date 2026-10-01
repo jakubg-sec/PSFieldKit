@@ -1,4 +1,3 @@
-```powershell
 function Show-ExchangeMenu {
     $ExchangeContext = $null
     $ConnectionRequiredOptions = @(
@@ -165,4 +164,3 @@ function Show-ExchangeMenu {
         }
     }
 }
-```
