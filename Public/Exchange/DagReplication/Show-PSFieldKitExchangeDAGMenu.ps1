@@ -41,20 +41,26 @@ function Show-PSFieldKitExchangeDAGMenu {
         Write-Host "|                                              |"
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|                                              |"
-        Write-Host "|  DAG MANAGEMENT                              |" -ForegroundColor DarkCyan
+        Write-Host "|  DAG INFORMATION                             |" -ForegroundColor DarkCyan
         Write-Host "|  [1] DAG Information                         |"
-        Write-Host "|  [2] DAG Member Status                       |"
-        Write-Host "|  [3] Database Replication Health             |"
-        Write-Host "|  [4] Activate Database Copy                  |"
-        Write-Host "|  [5] Suspend Database Copy                   |"
-        Write-Host "|  [6] Resume Database Copy                    |"
-        Write-Host "|  [7] Update Database Copy                    |"
-        Write-Host "|  [8] ReSeed Database Copy                    |"
-        Write-Host "|  [9] Add DAG Member                          |"
-        Write-Host "| [10] Remove DAG Member                       |"
-        Write-Host "| [11] DAG Network Information                 |"
-        Write-Host "| [12] Database Availability                   |"
-        Write-Host "| [13] DAG Health Check                        |"
+        Write-Host "|  [2] DAG Health Check                        |"
+        Write-Host "|                                              |"
+        Write-Host "|  DATABASE OPERATIONS                         |" -ForegroundColor DarkCyan
+        Write-Host "|  [3] Add Database Copy                       |"
+        Write-Host "|  [4] Remove Database Copy                    |"
+        Write-Host "|  [5] Activate Database Copy                  |"
+        Write-Host "|  [6] Suspend Database Copy                   |"
+        Write-Host "|  [7] Resume Database Copy                    |"
+        Write-Host "|  [8] Update Database Copy                    |"
+        Write-Host "|  [9] ReSeed Database Copy                    |"
+        Write-Host "|                                              |"
+        Write-Host "|  DAG MEMBERS                                 |" -ForegroundColor DarkCyan
+        Write-Host "| [10] Add DAG Member                          |"
+        Write-Host "| [11] Remove DAG Member                       |"
+        Write-Host "|                                              |"
+        Write-Host "|  DAG MANAGEMENT                              |" -ForegroundColor DarkCyan
+        Write-Host "| [12] Create DAG                              |"
+        Write-Host "| [13] Remove DAG                              |"
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"
         Write-Host "|                                              |"
@@ -68,51 +74,51 @@ function Show-PSFieldKitExchangeDAGMenu {
             }
 
             "2" {
-                Show-PSFieldKitExchangeDAGMemberStatus -ExchangeContext $ExchangeContext
+                Test-PSFieldKitExchangeDAGHealth -ExchangeContext $ExchangeContext
             }
 
             "3" {
-                Test-PSFieldKitExchangeDatabaseReplication -ExchangeContext $ExchangeContext
+                Add-PSFieldKitExchangeDatabaseCopy -ExchangeContext $ExchangeContext
             }
 
             "4" {
-                Move-PSFieldKitExchangeActiveDatabase -ExchangeContext $ExchangeContext
+                Remove-PSFieldKitExchangeDatabaseCopy -ExchangeContext $ExchangeContext
             }
 
             "5" {
-                Suspend-PSFieldKitExchangeDatabaseCopy -ExchangeContext $ExchangeContext
+                Move-PSFieldKitExchangeActiveDatabase -ExchangeContext $ExchangeContext
             }
 
             "6" {
-                Resume-PSFieldKitExchangeDatabaseCopy -ExchangeContext $ExchangeContext
+                Suspend-PSFieldKitExchangeDatabaseCopy -ExchangeContext $ExchangeContext
             }
 
             "7" {
-                Update-PSFieldKitExchangeDatabaseCopy -ExchangeContext $ExchangeContext
+                Resume-PSFieldKitExchangeDatabaseCopy -ExchangeContext $ExchangeContext
             }
 
             "8" {
-                Invoke-PSFieldKitExchangeDatabaseReseed -ExchangeContext $ExchangeContext
+                Update-PSFieldKitExchangeDatabaseCopy -ExchangeContext $ExchangeContext
             }
 
             "9" {
-                Add-PSFieldKitExchangeDAGMember -ExchangeContext $ExchangeContext
+                Invoke-PSFieldKitExchangeDatabaseReseed -ExchangeContext $ExchangeContext
             }
 
             "10" {
-                Remove-PSFieldKitExchangeDAGMember -ExchangeContext $ExchangeContext
+                Add-PSFieldKitExchangeDAGMember -ExchangeContext $ExchangeContext
             }
 
             "11" {
-                Show-PSFieldKitExchangeDAGNetwork -ExchangeContext $ExchangeContext
+                Remove-PSFieldKitExchangeDAGMember -ExchangeContext $ExchangeContext
             }
 
             "12" {
-                Show-PSFieldKitExchangeDatabaseAvailability -ExchangeContext $ExchangeContext
+                New-PSFieldKitExchangeDAG -ExchangeContext $ExchangeContext
             }
 
             "13" {
-                Test-PSFieldKitExchangeDAGHealth -ExchangeContext $ExchangeContext
+                Remove-PSFieldKitExchangeDAG -ExchangeContext $ExchangeContext
             }
 
             "0" {

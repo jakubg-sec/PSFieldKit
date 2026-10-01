@@ -19,8 +19,8 @@ function Test-PSFieldKitExchangeDAGHealth {
     Clear-Host
 
     Write-Host "+--------------------------------------------------+" -ForegroundColor DarkCyan
-    Write-Host "|                  DAG HEALTH CHECK                |" -ForegroundColor Cyan
-    Write-Host "|                     PSFieldKit                   |" -ForegroundColor Cyan
+    Write-Host "|                 DAG HEALTH CHECK                |" -ForegroundColor Cyan
+    Write-Host "|                    PSFieldKit                  |" -ForegroundColor Cyan
     Write-Host "+--------------------------------------------------+" -ForegroundColor DarkCyan
     Write-Host ""
 
@@ -42,20 +42,32 @@ function Test-PSFieldKitExchangeDAGHealth {
             Write-Host "DAG: $($DAG.Name)" -ForegroundColor Cyan
             Write-Host ""
 
-            # DAG Members
+            # -------------------------------------------------
+            # DAG MEMBERS
+            # -------------------------------------------------
+
             $Members = @(
                 $DAG.DatabaseAvailabilityGroupServers
             )
 
-            Write-Host "DAG Members: $($Members.Count)" -ForegroundColor White
+            Write-Host "DAG MEMBERS" -ForegroundColor DarkCyan
+            Write-Host ""
 
-            foreach ($Member in $Members) {
-                Write-Host "  [OK] $Member" -ForegroundColor Green
+            if ($Members.Count -eq 0) {
+                Write-Host "[FAIL] No DAG members found." -ForegroundColor Red
+            }
+            else {
+                foreach ($Member in $Members) {
+                    Write-Host "[OK]   $Member" -ForegroundColor Green
+                }
             }
 
             Write-Host ""
 
-            # Database Copies
+            # -------------------------------------------------
+            # DATABASE COPIES
+            # -------------------------------------------------
+
             $DAGCopies = @(
                 $DatabaseCopies |
                     Where-Object {
@@ -63,85 +75,139 @@ function Test-PSFieldKitExchangeDAGHealth {
                     }
             )
 
+            Write-Host "DATABASE COPIES" -ForegroundColor DarkCyan
+            Write-Host ""
+
             if ($DAGCopies.Count -eq 0) {
-                Write-Host "No database copies found for this DAG." -ForegroundColor Yellow
-                Write-Host ""
-                continue
+                Write-Host "[WARN] No database copies found." -ForegroundColor Yellow
+            }
+            else {
+                foreach ($Copy in $DAGCopies) {
+
+                    $Status = [string]$Copy.Status
+
+                    $StatusOK = $Status -in @(
+                        "Mounted",
+                        "Healthy"
+                    )
+
+                    $CopyQueue = 0
+                    $ReplayQueue = 0
+
+                    if ($null -ne $Copy.CopyQueueLength) {
+                        $CopyQueue = [int]$Copy.CopyQueueLength
+                    }
+
+                    if ($null -ne $Copy.ReplayQueueLength) {
+                        $ReplayQueue = [int]$Copy.ReplayQueueLength
+                    }
+
+                    $QueueOK = (
+                        $CopyQueue -eq 0 -and
+                        $ReplayQueue -eq 0
+                    )
+
+                    if ($StatusOK -and $QueueOK) {
+                        $HealthState = "OK"
+                        $Color = "Green"
+                    }
+                    elseif ($StatusOK) {
+                        $HealthState = "WARN"
+                        $Color = "Yellow"
+                    }
+                    else {
+                        $HealthState = "FAIL"
+                        $Color = "Red"
+                    }
+
+                    Write-Host (
+                        "[{0}] {1}\{2} - {3} - CopyQ: {4} - ReplayQ: {5}" -f `
+                        $HealthState,
+                        $Copy.Name,
+                        $Copy.MailboxServer,
+                        $Status,
+                        $CopyQueue,
+                        $ReplayQueue
+                    ) -ForegroundColor $Color
+                }
             }
 
-            Write-Host "Database Copies:" -ForegroundColor Cyan
             Write-Host ""
 
-            foreach ($Copy in $DAGCopies) {
+            # -------------------------------------------------
+            # REPLICATION
+            # -------------------------------------------------
 
-                $StatusOK = $Copy.Status -in @(
-                    "Mounted",
-                    "Healthy"
-                )
-
-                $QueueOK = (
-                    [int]$Copy.CopyQueueLength -eq 0 -and
-                    [int]$Copy.ReplayQueueLength -eq 0
-                )
-
-                if ($StatusOK -and $QueueOK) {
-                    Write-Host (
-                        "[OK]   {0}\{1} - {2} - CopyQ: {3} - ReplayQ: {4}" -f `
-                        $Copy.Name,
-                        $Copy.MailboxServer,
-                        $Copy.Status,
-                        $Copy.CopyQueueLength,
-                        $Copy.ReplayQueueLength
-                    ) -ForegroundColor Green
-                }
-                elseif ($StatusOK) {
-                    Write-Host (
-                        "[WARN] {0}\{1} - {2} - CopyQ: {3} - ReplayQ: {4}" -f `
-                        $Copy.Name,
-                        $Copy.MailboxServer,
-                        $Copy.Status,
-                        $Copy.CopyQueueLength,
-                        $Copy.ReplayQueueLength
-                    ) -ForegroundColor Yellow
-                }
-                else {
-                    Write-Host (
-                        "[FAIL] {0}\{1} - {2} - CopyQ: {3} - ReplayQ: {4}" -f `
-                        $Copy.Name,
-                        $Copy.MailboxServer,
-                        $Copy.Status,
-                        $Copy.CopyQueueLength,
-                        $Copy.ReplayQueueLength
-                    ) -ForegroundColor Red
-                }
-            }
-
+            Write-Host "REPLICATION" -ForegroundColor DarkCyan
             Write-Host ""
 
-            # Summary
             $FailedCopies = @(
                 $DAGCopies |
                     Where-Object {
-                        $_.Status -notin @("Mounted", "Healthy")
+                        $_.Status -notin @(
+                            "Mounted",
+                            "Healthy"
+                        )
                     }
             )
 
             $QueueProblems = @(
                 $DAGCopies |
                     Where-Object {
-                        [int]$_.CopyQueueLength -gt 0 -or
-                        [int]$_.ReplayQueueLength -gt 0
+                        $CopyQueue = 0
+                        $ReplayQueue = 0
+
+                        if ($null -ne $_.CopyQueueLength) {
+                            $CopyQueue = [int]$_.CopyQueueLength
+                        }
+
+                        if ($null -ne $_.ReplayQueueLength) {
+                            $ReplayQueue = [int]$_.ReplayQueueLength
+                        }
+
+                        $CopyQueue -gt 0 -or
+                        $ReplayQueue -gt 0
                     }
             )
 
-            if ($FailedCopies.Count -eq 0 -and $QueueProblems.Count -eq 0) {
-                Write-Host "DAG Health: HEALTHY" -ForegroundColor Green
-            }
-            elseif ($FailedCopies.Count -eq 0) {
-                Write-Host "DAG Health: WARNING" -ForegroundColor Yellow
+            if ($FailedCopies.Count -eq 0) {
+                Write-Host "[OK]   Database copy status" -ForegroundColor Green
             }
             else {
-                Write-Host "DAG Health: CRITICAL" -ForegroundColor Red
+                Write-Host (
+                    "[FAIL] {0} database copy/copies have unhealthy status" -f
+                    $FailedCopies.Count
+                ) -ForegroundColor Red
+            }
+
+            if ($QueueProblems.Count -eq 0) {
+                Write-Host "[OK]   Replication queues" -ForegroundColor Green
+            }
+            else {
+                Write-Host (
+                    "[WARN] {0} database copy/copies have replication queue backlog" -f
+                    $QueueProblems.Count
+                ) -ForegroundColor Yellow
+            }
+
+            Write-Host ""
+
+            # -------------------------------------------------
+            # OVERALL HEALTH
+            # -------------------------------------------------
+
+            if (
+                $Members.Count -gt 0 -and
+                $FailedCopies.Count -eq 0 -and
+                $QueueProblems.Count -eq 0
+            ) {
+                Write-Host "DAG HEALTH: HEALTHY" -ForegroundColor Green
+            }
+            elseif ($FailedCopies.Count -eq 0) {
+                Write-Host "DAG HEALTH: WARNING" -ForegroundColor Yellow
+            }
+            else {
+                Write-Host "DAG HEALTH: CRITICAL" -ForegroundColor Red
             }
 
             Write-Host ""

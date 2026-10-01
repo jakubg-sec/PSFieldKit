@@ -20,14 +20,13 @@ function Show-PSFieldKitExchangeDAGMemberStatusMenu {
         Clear-Host
 
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
-        Write-Host "|             DAG MEMBER STATUS               |" -ForegroundColor Cyan
-        Write-Host "|                 PSFieldKit                  |" -ForegroundColor Cyan
+        Write-Host "|             DAG MEMBER STATUS                |" -ForegroundColor Cyan
+        Write-Host "|                 PSFieldKit                   |" -ForegroundColor Cyan
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|                                              |"
-        Write-Host "|  [1] All DAG Members                         |"
-        Write-Host "|  [2] Healthy Members                         |"
-        Write-Host "|  [3] Unhealthy Members                       |"
-        Write-Host "|  [4] Member Details                           |"
+        Write-Host "|  [1] Healthy Members                         |"
+        Write-Host "|  [2] Unhealthy Members                       |"
+        Write-Host "|  [3] Member Details                          |"
         Write-Host "|                                              |"
         Write-Host "|  [0] Back                                    |"
         Write-Host "|                                              |"
@@ -37,29 +36,21 @@ function Show-PSFieldKitExchangeDAGMemberStatusMenu {
 
         switch ($Choice) {
             "1" {
-                Get-PSFieldKitExchangeDAGMembers `
-                    -ExchangeContext $ExchangeContext
-            }
-
-            "2" {
-                Get-PSFieldKitExchangeDAGMembers `
-                    -ExchangeContext $ExchangeContext |
+                Get-PSFieldKitExchangeDAGMembers -ExchangeContext $ExchangeContext |
                     Where-Object {
                         $_.OperationalServer -eq $true
                     }
             }
 
-            "3" {
-                Get-PSFieldKitExchangeDAGMembers `
-                    -ExchangeContext $ExchangeContext |
+            "2" {
+                Get-PSFieldKitExchangeDAGMembers -ExchangeContext $ExchangeContext |
                     Where-Object {
                         $_.OperationalServer -ne $true
                     }
             }
 
-            "4" {
-                Show-PSFieldKitExchangeDAGMemberDetails `
-                    -ExchangeContext $ExchangeContext
+            "3" {
+                Show-PSFieldKitExchangeDAGMemberDetails -ExchangeContext $ExchangeContext
             }
 
             "0" {

@@ -20,8 +20,8 @@ function Show-PSFieldKitExchangeDAGInformationMenu {
         Clear-Host
 
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
-        Write-Host "|              DAG INFORMATION                |" -ForegroundColor Cyan
-        Write-Host "|                 PSFieldKit                  |" -ForegroundColor Cyan
+        Write-Host "|              DAG INFORMATION                 |" -ForegroundColor Cyan
+        Write-Host "|                 PSFieldKit                   |" -ForegroundColor Cyan
         Write-Host "+----------------------------------------------+" -ForegroundColor DarkCyan
         Write-Host "|                                              |"
         Write-Host "|  [1] DAG List                                |"
